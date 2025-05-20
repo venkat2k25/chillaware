@@ -33,7 +33,6 @@ export default function InventoryScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [inventoryData, setInventoryData] = useState([]);
 
-  // Load inventory data from AsyncStorage when component mounts
   useEffect(() => {
     loadInventoryData();
   }, []);
@@ -51,7 +50,7 @@ export default function InventoryScreen() {
           purchaseDate: item.purchase_date || "Unknown Date",
           weight: item.weight || "N/A",
           expiryDate: item.expiry_date || "N/A",
-          originalIndex: index, // Store original index for deletion
+          originalIndex: index,
         }));
         setInventoryData(formattedData);
       }
@@ -60,28 +59,22 @@ export default function InventoryScreen() {
     }
   };
 
-  // Function to delete an item from inventory
+  //  delete an item from inventory
   const deleteItem = async (itemId, originalIndex) => {
     try {
-      // Confirm deletion with alert
       Alert.alert(
-        "Delete Item",
-        "Are you sure you want to delete this item?",
+        "Delete","Are you sure you want to delete this item?",
         [
           { text: "Cancel", style: "cancel" },
           {
             text: "Delete",
             style: "destructive",
             onPress: async () => {
-              // Get current inventory data
               const data = await AsyncStorage.getItem("inventory");
               if (data) {
                 const parsedData = JSON.parse(data);
-                // Remove the item at the original index
                 parsedData.splice(originalIndex, 1);
-                // Save updated inventory
                 await AsyncStorage.setItem("inventory", JSON.stringify(parsedData));
-                // Update state by filtering out the deleted item
                 setInventoryData(inventoryData.filter(item => item.id !== itemId));
               }
             }
@@ -98,13 +91,13 @@ export default function InventoryScreen() {
     item.productName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // No longer need table header with card design
 
   // Render each inventory item as a card
   const renderItem = ({ item }) => {
     const formattedDate = item.purchaseDate.split('-').reverse().join('-');
     return (
       <View style={styles.card}>
+        
         {/* Blob behind text */}
         <View style={styles.blobWrapper}>
           <BlobBackground />
@@ -124,13 +117,13 @@ export default function InventoryScreen() {
 
         <View style={styles.iconsContainer}>
           <TouchableOpacity style={styles.micIconContainer}>
-            <Ionicons name="mic" size={18} color={Colors.primary} />
+            <Ionicons name="mic" size={12} color={Colors.primary} />
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.deleteIconContainer}
             onPress={() => deleteItem(item.id, item.originalIndex)}
           >
-            <Ionicons name="trash-outline" size={18} color={Colors.primary} />
+            <Ionicons name="trash-outline" size={12} color={Colors.bg} />
           </TouchableOpacity>
         </View>
       </View>
@@ -212,11 +205,11 @@ const styles = StyleSheet.create({
   },
   card: {
     position: "relative",
-    backgroundColor: "#F4F2FF",
+    backgroundColor: Colors.card,
     borderRadius: 15,
     padding: 20,
     marginVertical: 10,
-    shadowColor: "#00000033",
+    shadowColor: Colors.secondary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
     shadowRadius: 6,
@@ -224,7 +217,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
   },
   cardTitle: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: "600",
     color: Colors.bg,
     marginBottom: 12,
@@ -247,8 +240,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   micIconContainer: {
-    backgroundColor: "#000a36",
-    padding: 10,
+    backgroundColor: Colors.bg,
+    padding: 8,
     borderRadius: 50, 
     elevation: 6,
     shadowColor: Colors.secondary,
@@ -257,8 +250,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   deleteIconContainer: {
-    backgroundColor: "#ff4d4d",
-    padding: 10,
+    backgroundColor: Colors.primary,
+    padding: 8,
     borderRadius: 50,
     elevation: 6,
     shadowColor: "#000",

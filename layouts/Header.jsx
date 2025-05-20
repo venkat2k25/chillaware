@@ -9,8 +9,8 @@ const Header = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        {/* <Image source={LogoImg} style={styles.logo} /> */}
-        <Text style={styles.logoText}>ChillAware</Text>
+        <Image source={LogoImg} style={styles.logo} />
+        {/* <Text style={styles.logoText}>ChillAware</Text> */}
       </View>
       <View>
         <TouchableOpacity style={styles.icon} >
@@ -46,8 +46,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   logo: {
-    width: 35,
-    height: 35,
+    width: 80,
+    height: 40,
+    objectFit: 'contain'
   },
   logoText: {
     color: Colors.primary,
@@ -55,8 +56,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Syne-SemiBold'
   },
   icon: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 20,
     backgroundColor: Colors.primary,
     alignItems: "center",
