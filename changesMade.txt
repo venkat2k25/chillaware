@@ -1,0 +1,14 @@
+1.Removed npm from package.json.
+
+2.Ran: npm audit --force (To fix package dependancy issues)
+
+**Please use expo version of any library.
+
+3.Added:
+ "expo": {
+    "doctor": {
+      "reactNativeDirectoryCheck": {
+        "listUnknownPackages": false
+      }
+    }
+  },
