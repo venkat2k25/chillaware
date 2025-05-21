@@ -13,7 +13,7 @@ const Header = () => {
         <Text style={styles.logoText}>ChillAware</Text>
       </View>
       <View>
-        <TouchableOpacity style={styles.icon} >
+        <TouchableOpacity style={styles.icon} onPress={() => navigation.navigate('Notification')}>
           <Ionicons name="notifications" size={22} color={Colors.background} />
         </TouchableOpacity>
       </View>

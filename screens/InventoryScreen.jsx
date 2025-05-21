@@ -198,7 +198,12 @@ const styles = StyleSheet.create({
   searchIcon:{
     backgroundColor: Colors.bg,
     padding: 10,
-    borderRadius: 50
+    borderRadius: 50,
+    elevation: 6,
+    shadowColor: Colors.secondary,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   ListContent:{
     paddingBottom: 100,
@@ -254,7 +259,7 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 50,
     elevation: 6,
-    shadowColor: "#000",
+    shadowColor: Colors.secondary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 4,

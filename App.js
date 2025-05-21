@@ -7,6 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import MainTab from './navigations/MainTab'; 
 import Colors from './utils/Colors';
+import NotificationScreen from './screens/NotificationScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,8 @@ export default function App() {
                 contentStyle: { backgroundColor: '#131417' },
               }}>
               <Stack.Screen name="MainTab" component={MainTab} />
+              <Stack.Screen name="Notification" component={NotificationScreen} />
+
             </Stack.Navigator>
           </NavigationContainer>
         </View>
