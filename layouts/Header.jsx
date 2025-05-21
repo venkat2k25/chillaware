@@ -9,12 +9,12 @@ const Header = () => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image source={LogoImg} style={styles.logo} />
-        {/* <Text style={styles.logoText}>ChillAware</Text> */}
+        {/* <Image source={LogoImg} style={styles.logo} /> */}
+        <Text style={styles.logoText}>ChillAware</Text>
       </View>
       <View>
         <TouchableOpacity style={styles.icon} >
-          <Ionicons name="notifications" size={22} color={Colors.text} />
+          <Ionicons name="notifications" size={22} color={Colors.background} />
         </TouchableOpacity>
       </View>
     </View>
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     zIndex: 100,
     elevation: 4,
-    shadowColor: Colors.secondary,
+    shadowColor: Colors.text,
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 2 },
     marginBottom: 10,
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     objectFit: 'contain'
   },
   logoText: {
-    color: Colors.primary,
+    color: Colors.text,
     fontSize: 22,
     fontFamily: 'Syne-SemiBold'
   },
@@ -59,7 +59,7 @@ const styles = StyleSheet.create({
     width: 35,
     height: 35,
     borderRadius: 20,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.text,
     alignItems: "center",
     justifyContent: "center",
     overflow: 'hidden',

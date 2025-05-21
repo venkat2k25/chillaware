@@ -17,7 +17,7 @@ export default function MainTab() {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarStyle: {
-          backgroundColor: "#131417",
+          backgroundColor: Colors.text + "10",
           height: 80,
         },
         tabBarIcon: ({ focused }) => {
@@ -48,7 +48,7 @@ export default function MainTab() {
           }
 
           // const gradientColors = ["#E6F3FF", "#4DA8DA", "#0A558C"];
-          const gradientColors = ["#FFFFFF", "#FFFFFF", "#FFFFFF"];
+          const gradientColors = ["#A8E6A3", "#A8E6A3", "#A8E6A3"];
 
 
           return (

@@ -5,8 +5,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-
 import MainTab from './navigations/MainTab'; 
+import Colors from './utils/Colors';
 
 const Stack = createNativeStackNavigator();
 
@@ -46,10 +46,10 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#000A34',
+    backgroundColor: Colors.bg,
   },
   container: {
     flex: 1,
-    backgroundColor: '#131417',
+    backgroundColor: Colors.background,
   },
 });

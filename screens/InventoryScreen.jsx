@@ -117,13 +117,13 @@ export default function InventoryScreen() {
 
         <View style={styles.iconsContainer}>
           <TouchableOpacity style={styles.micIconContainer}>
-            <Ionicons name="mic" size={12} color={Colors.primary} />
+            <Ionicons name="mic" size={12} color={Colors.background} />
           </TouchableOpacity>
           <TouchableOpacity 
             style={styles.deleteIconContainer}
             onPress={() => deleteItem(item.id, item.originalIndex)}
           >
-            <Ionicons name="trash-outline" size={12} color={Colors.bg} />
+            <Ionicons name="trash-outline" size={12} color={Colors.text} />
           </TouchableOpacity>
         </View>
       </View>
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    backgroundColor: Colors.primary,
+    backgroundColor: Colors.background,
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 15,
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: Colors.bg,
+    color: Colors.text,
     marginBottom: 12,
     zIndex: 1,
   },
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   micIconContainer: {
-    backgroundColor: Colors.bg,
+    backgroundColor: Colors.text,
     padding: 8,
     borderRadius: 50, 
     elevation: 6,

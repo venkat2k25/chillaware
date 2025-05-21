@@ -113,7 +113,7 @@ export default function CookScreen() {
 
   // Handle servings change
   const handleServingsChange = (value) => {
-    setServings(Math.max(1, Math.min(10, value))); 
+    setServings(Math.max(1, Math.min(10, value)));
   };
 
   // Handle generate recipes
@@ -122,79 +122,30 @@ export default function CookScreen() {
     setError(null);
 
     try {
-      // This would be replaced with actual API call to Gemini
-      // For now, we'll simulate a response with mock data
-      setTimeout(() => {
-        const mockRecipes = [
-          {
-            id: "1",
-            name: "Vegetable Stir Fry",
-            difficulty: "Easy",
-            prepTime: 20,
-            imageUrl:
-              "https://images.unsplash.com/photo-1512621776951-a57141f2eefd",
-            ingredients: ["Broccoli", "Carrots", "Bell Peppers", "Soy Sauce"],
-            steps: [
-              "Chop all vegetables into bite-sized pieces",
-              "Heat oil in a wok or large pan",
-              "Add vegetables and stir-fry for 5-7 minutes",
-              "Add soy sauce and other seasonings",
-              "Serve hot with rice or noodles",
-            ],
-          },
-          {
-            id: "2",
-            name: "Quinoa Salad",
-            difficulty: "Easy",
-            prepTime: 15,
-            imageUrl:
-              "https://images.unsplash.com/photo-1505253716362-afaea1d3d1af",
-            ingredients: [
-              "Quinoa",
-              "Cucumber",
-              "Cherry Tomatoes",
-              "Feta Cheese",
-              "Olive Oil",
-            ],
-            steps: [
-              "Cook quinoa according to package instructions",
-              "Chop cucumber and tomatoes",
-              "Mix all ingredients in a bowl",
-              "Drizzle with olive oil and lemon juice",
-              "Season with salt and pepper to taste",
-            ],
-          },
-          {
-            id: "3",
-            name: "Baked Salmon",
-            difficulty: "Medium",
-            prepTime: 30,
-            imageUrl:
-              "https://images.unsplash.com/photo-1519708227418-c8fd9a32b7a2",
-            ingredients: [
-              "Salmon fillets",
-              "Lemon",
-              "Dill",
-              "Olive Oil",
-              "Garlic",
-            ],
-            steps: [
-              "Preheat oven to 375°F (190°C)",
-              "Place salmon on baking sheet lined with parchment paper",
-              "Drizzle with olive oil and season with salt, pepper, and minced garlic",
-              "Top with lemon slices and dill",
-              "Bake for 15-20 minutes until salmon flakes easily with a fork",
-            ],
-          },
-        ];
+      const response = await fetch("http://192.168.0.215:8001/api/generate_recipes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          foodType: selectedFoodType.id,
+          servings,
+          inventory: inventoryItems,
+        }),
+      });
 
-        setRecipes(mockRecipes);
-        setCurrentStep("recipes");
-        setLoading(false);
-      }, 2000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.detail || "Failed to generate recipes");
+      }
+
+      setRecipes(data.recipes);
+      setCurrentStep("recipes");
     } catch (err) {
-      console.error("Failed to generate recipes:", err);
-      setError("Failed to generate recipes. Please try again.");
+      console.error("Error generating recipes:", err);
+      setError(err.message || "An error occurred while generating recipes");
+    } finally {
       setLoading(false);
     }
   };
@@ -203,6 +154,17 @@ export default function CookScreen() {
   const handleRecipeSelect = (recipe) => {
     setSelectedRecipe(recipe);
     setCurrentStep("details");
+  };
+
+  // Handle back button
+  const handleBack = () => {
+    if (currentStep === "servings") {
+      setCurrentStep("foodType");
+    } else if (currentStep === "recipes") {
+      setCurrentStep("servings");
+    } else if (currentStep === "details") {
+      setCurrentStep("recipes");
+    }
   };
 
   // Render food type selection screen
@@ -225,7 +187,7 @@ export default function CookScreen() {
                 { backgroundColor: item.color },
               ]}
             >
-              <Ionicons name={item.icon} size={24} color="white" />
+              <Ionicons name={item.icon} size={24} color={Colors.background} />
             </View>
             <Text style={styles.foodTypeName}>{item.name}</Text>
             <Ionicons
@@ -238,6 +200,50 @@ export default function CookScreen() {
         )}
         contentContainerStyle={styles.foodTypeList}
       />
+    </View>
+  );
+
+  // Render servings selection screen
+  const renderServingsSelection = () => (
+    <View style={styles.stepContainer}>
+      <TouchableOpacity onPress={handleBack} style={styles.backButton}>
+        <Ionicons name="arrow-back" size={20} color={Colors.background} />
+      </TouchableOpacity>
+
+      <View style={styles.servingsContainer}>
+        <View style={styles.servingsCard}>
+          <View style={styles.blobWrapper}>
+            <BlobBackground />
+          </View>
+
+          <Text style={styles.servingsTitle}>Number of Servings</Text>
+
+          <View style={styles.servingsInputContainer}>
+            <TouchableOpacity
+              style={styles.servingsButton}
+              onPress={() => handleServingsChange(servings - 1)}
+            >
+              <Ionicons name="remove" size={20} color={Colors.background} />
+            </TouchableOpacity>
+
+            <Text style={styles.servingsValue}>{servings}</Text>
+
+            <TouchableOpacity
+              style={styles.servingsButton}
+              onPress={() => handleServingsChange(servings + 1)}
+            >
+              <Ionicons name="add" size={20} color={Colors.background} />
+            </TouchableOpacity>
+          </View>
+
+          <TouchableOpacity
+            style={styles.generateButton}
+            onPress={handleGenerateRecipes}
+          >
+            <Text style={styles.generateButtonText}>Generate Recipes</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 
@@ -297,9 +303,7 @@ export default function CookScreen() {
               </View>
 
               <TouchableOpacity
-                style={[
-                  styles.selectRecipeButton
-                ]}
+                style={styles.selectRecipeButton}
                 onPress={() => handleRecipeSelect(item)}
               >
                 <Text style={styles.selectRecipeButtonText}>
@@ -337,18 +341,18 @@ export default function CookScreen() {
 
             <View style={styles.recipeDetailMeta}>
               <View style={styles.minServe}>
-              <View style={styles.recipeDetailMetaItem}>
-                <Ionicons name="time-outline" size={18} color="white" />
-                <Text style={styles.recipeDetailMetaText}>
-                  {selectedRecipe.prepTime} mins
-                </Text>
-              </View>
-              <View style={styles.recipeDetailMetaItem}>
-                <Ionicons name="people-outline" size={18} color="white" />
-                <Text style={styles.recipeDetailMetaText}>
-                  {servings} servings
-                </Text>
-              </View>
+                <View style={styles.recipeDetailMetaItem}>
+                  <Ionicons name="time-outline" size={18} color="white" />
+                  <Text style={styles.recipeDetailMetaText}>
+                    {selectedRecipe.prepTime} mins
+                  </Text>
+                </View>
+                <View style={styles.recipeDetailMetaItem}>
+                  <Ionicons name="people-outline" size={18} color="white" />
+                  <Text style={styles.recipeDetailMetaText}>
+                    {servings} servings
+                  </Text>
+                </View>
               </View>
 
               <View
@@ -365,8 +369,6 @@ export default function CookScreen() {
                   {selectedRecipe.difficulty}
                 </Text>
               </View>
-
-              
             </View>
           </View>
         </View>
@@ -374,20 +376,13 @@ export default function CookScreen() {
         <View style={styles.recipeDetailContent}>
           <View style={styles.recipeDetailSection}>
             <Text style={styles.recipeDetailSectionTitle}>
-              <Ionicons
-                name="list-outline"
-                size={20}
-                color={Colors.bg}
-              />{" "}
+              <Ionicons name="list-outline" size={20} color={Colors.bg} />{" "}
               Ingredients
             </Text>
             {selectedRecipe.ingredients.map((ingredient, index) => (
               <View key={index} style={styles.ingredientItem}>
                 <View
-                  style={[
-                    styles.ingredientDot,
-                    { backgroundColor: Colors.bg },
-                  ]}
+                  style={[styles.ingredientDot, { backgroundColor: Colors.bg }]}
                 />
                 <Text style={styles.ingredientText}>{ingredient}</Text>
               </View>
@@ -396,11 +391,7 @@ export default function CookScreen() {
 
           <View style={styles.recipeDetailSection}>
             <Text style={styles.recipeDetailSectionTitle}>
-              <Ionicons
-                name="restaurant-outline"
-                size={20}
-                color={Colors.bg}
-              />{" "}
+              <Ionicons name="restaurant-outline" size={20} color={Colors.bg} />{" "}
               Preparation Steps
             </Text>
             {selectedRecipe.steps.map((step, index) => (
@@ -415,11 +406,7 @@ export default function CookScreen() {
 
           <View style={styles.recipeDetailSection}>
             <Text style={styles.recipeDetailSectionTitle}>
-              <Ionicons
-                name="bulb-outline"
-                size={20}
-                color={Colors.bg}
-              />{" "}
+              <Ionicons name="bulb-outline" size={20} color={Colors.bg} />{" "}
               Cooking Tips
             </Text>
             <Text style={styles.tipText}>
@@ -437,63 +424,6 @@ export default function CookScreen() {
       </View>
     );
   };
-
-  // Handle back button
-  const handleBack = () => {
-    if (currentStep === "servings") {
-      setCurrentStep("foodType");
-    } else if (currentStep === "recipes") {
-      setCurrentStep("servings");
-    } else if (currentStep === "details") {
-      setCurrentStep("recipes");
-    }
-  };
-
-  // Render servings selection screen
-  const renderServingsSelection = () => (
-    <View style={styles.stepContainer}>
-      <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={20} color={Colors.primary} />
-      </TouchableOpacity>
-
-      <View style={styles.servingsContainer}>
-        <View style={styles.servingsCard}>
-          <View style={styles.blobWrapper}>
-            <BlobBackground />
-          </View>
-
-          <Text style={styles.servingsTitle}>Number of Servings</Text>
-
-          <View style={styles.servingsInputContainer}>
-            <TouchableOpacity
-              style={styles.servingsButton}
-              onPress={() => handleServingsChange(servings - 1)}
-            >
-              <Ionicons name="remove" size={20} color={Colors.primary} />
-            </TouchableOpacity>
-
-            <Text style={styles.servingsValue}>{servings}</Text>
-
-            <TouchableOpacity
-              style={styles.servingsButton}
-              onPress={() => handleServingsChange(servings + 1)}
-            >
-              <Ionicons name="add" size={20} color={Colors.primary} />
-            </TouchableOpacity>
-          </View>
-
-          <TouchableOpacity
-            style={[
-              styles.generateButton
-            ]}
-            onPress={handleGenerateRecipes}
-          >
-            <Text style={styles.generateButtonText}>Generate Recipes</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </View>
-  );
 
   return (
     <View style={styles.container}>
@@ -559,7 +489,6 @@ const styles = StyleSheet.create({
     color: Colors.text,
     marginBottom: 24,
   },
-  // Food type selection styles
   foodTypeList: {
     paddingBottom: 20,
   },
@@ -587,13 +516,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.bg,
+    color: Colors.text,
   },
   foodTypeArrow: {
     marginLeft: 8,
   },
   backButton: {
-    backgroundColor: Colors.bg,
+    backgroundColor: Colors.text,
     padding: 10,
     borderRadius: 50,
     marginBottom: 20,
@@ -632,7 +561,7 @@ const styles = StyleSheet.create({
   servingsTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.bg,
+    color: Colors.text,
     marginBottom: 24,
     zIndex: 1,
   },
@@ -647,7 +576,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 24,
-    backgroundColor: Colors.bg + "40",
+    backgroundColor: Colors.text + "50",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -663,14 +592,14 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.bg + "90",
+    backgroundColor: Colors.text + "90",
     width: "100%",
     zIndex: 1,
   },
   generateButtonText: {
     fontSize: 18,
     fontWeight: "500",
-    color: Colors.primary,
+    color: Colors.background
   },
   loadingContainer: {
     flex: 1,
@@ -708,7 +637,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: Colors.bg,
   },
-  // Recipe list styles
   recipeList: {
     paddingTop: 10,
   },
@@ -800,7 +728,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: Colors.primary,
   },
-  // Recipe details styles
   recipeDetailHeader: {
     height: 220,
     position: "relative",
@@ -828,7 +755,7 @@ const styles = StyleSheet.create({
   },
   minServe: {
     flexDirection: 'row',
-    gap: 15
+    gap: 15,
   },
   recipeDetailMeta: {
     flexDirection: "row",

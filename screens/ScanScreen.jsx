@@ -191,7 +191,7 @@ export default function ScanScreen() {
       >
         {loadingInventory ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.secondary} />
+            <ActivityIndicator size="large" color={Colors.text} />
             <Text style={styles.loadingText}>Processing inventory...</Text>
           </View>
         ) : (
@@ -225,7 +225,7 @@ export default function ScanScreen() {
               },
             ].map((item, index) => (
               <View key={index} style={styles.instructionItem}>
-                <Ionicons name={item.icon} size={24} color={Colors.secondary} />
+                <Ionicons name={item.icon} size={24} color={Colors.text} />
                 <View style={styles.instructionTextContainer}>
                   <Text style={styles.instructionPointTitle}>{item.title}</Text>
                   <Text style={styles.instructionPoint}>{item.desc}</Text>
@@ -238,11 +238,11 @@ export default function ScanScreen() {
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={captureImageWithCamera}>
-          <Entypo name="camera" size={24} color={Colors.LightGray} />
+          <Entypo name="camera" size={24} color={Colors.background} />
         </TouchableOpacity>
         <Text style={styles.line}>|</Text>
         <TouchableOpacity style={styles.button} onPress={pickImageFromGallery}>
-          <Entypo name="images" size={24} color={Colors.LightGray} />
+          <Entypo name="images" size={24} color={Colors.background} />
         </TouchableOpacity>
       </View>
     </View>
@@ -268,11 +268,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: "#131417",
+    backgroundColor: Colors.text,
     paddingVertical: 12,
     borderRadius: 50,
     elevation: 10,
-    shadowColor: Colors.secondary,
+    shadowColor: Colors.text,
     shadowOffset: { width: 0, height: 5 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
@@ -281,14 +281,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   line: {
-    color: Colors.primary,
+    color: Colors.background,
     fontSize: 24,
     fontWeight: "200",
   },
   instructionsContainer: {
     padding: 20,
     marginVertical: 15,
-    backgroundColor: Colors.cardBackground,
     borderRadius: 8,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -298,7 +297,7 @@ const styles = StyleSheet.create({
   instructionTitle: {
     fontSize: 22,
     fontWeight: "bold",
-    color: Colors.secondary,
+    color: Colors.text,
     marginBottom: 30,
     textAlign: "center",
   },
@@ -314,7 +313,7 @@ const styles = StyleSheet.create({
   instructionPointTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: Colors.secondary,
+    color: Colors.text,
     marginBottom: 5,
   },
   instructionPoint: {
@@ -330,7 +329,7 @@ const styles = StyleSheet.create({
   loadingText: {
     textAlign: "center",
     marginVertical: 10,
-    color: Colors.primary,
+    color: Colors.backgorund,
     fontWeight: "600",
   },
 });

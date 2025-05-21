@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/icons/Logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#030B38"
+      "backgroundColor": "#A8E6A3"
     },
     "ios": {
       "supportsTablet": true
@@ -18,7 +18,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/Logo.png",
-        "backgroundColor": "#030B38"
+        "backgroundColor": "#A8E6A3"
       },
       "package": "com.karthi_2002.ChillAware"
     },
