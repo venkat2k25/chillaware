@@ -33,25 +33,66 @@ def configure_tesseract():
     system = platform.system().lower()
     
     if system == "windows":
-        # Windows path
-        tesseract_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
-        if os.path.exists(tesseract_path):
-            pytesseract.pytesseract.tesseract_cmd = tesseract_path
-            logger.info(f"Tesseract configured for Windows: {tesseract_path}")
-        else:
-            logger.warning("Tesseract not found at default Windows path")
+        # Windows path - try multiple common locations
+        windows_paths = [
+            r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+            r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+            r"C:\Tesseract-OCR\tesseract.exe"
+        ]
+        
+        for path in windows_paths:
+            if os.path.exists(path):
+                pytesseract.pytesseract.tesseract_cmd = path
+                logger.info(f"Tesseract configured for Windows: {path}")
+                return
+                
+        logger.warning("Tesseract not found at any Windows paths")
     else:
-        # Linux/Docker - tesseract should be in PATH
+        # Linux/Docker environment - Render deployment
+        # For Docker on Render, tesseract should be in PATH
         try:
-            # Test if tesseract is available in PATH
+            # First check if TESSERACT_PATH environment variable is set (useful for Render)
+            tesseract_path = os.environ.get('TESSERACT_PATH')
+            if tesseract_path and os.path.exists(tesseract_path):
+                pytesseract.pytesseract.tesseract_cmd = tesseract_path
+                logger.info(f"Tesseract configured from environment variable: {tesseract_path}")
+                return
+                
+            # Next, try to find tesseract in PATH
             import subprocess
             result = subprocess.run(['which', 'tesseract'], 
                                   capture_output=True, text=True, check=True)
             tesseract_path = result.stdout.strip()
-            pytesseract.pytesseract.tesseract_cmd = tesseract_path
-            logger.info(f"Tesseract found in PATH: {tesseract_path}")
+            
+            # In Docker, explicitly set the path to avoid Windows path issues
+            if tesseract_path:
+                pytesseract.pytesseract.tesseract_cmd = tesseract_path
+                logger.info(f"Tesseract found in PATH: {tesseract_path}")
+            else:
+                # Try common Linux paths as fallback
+                linux_paths = [
+                    '/usr/bin/tesseract',
+                    '/usr/local/bin/tesseract'
+                ]
+                for path in linux_paths:
+                    if os.path.exists(path):
+                        pytesseract.pytesseract.tesseract_cmd = path
+                        logger.info(f"Tesseract found at common Linux path: {path}")
+                        return
+                logger.warning("Tesseract not found in common Linux paths")
         except (subprocess.CalledProcessError, FileNotFoundError):
             logger.warning("Tesseract not found in PATH")
+            # Try common Linux paths as fallback
+            linux_paths = [
+                '/usr/bin/tesseract',
+                '/usr/local/bin/tesseract'
+            ]
+            for path in linux_paths:
+                if os.path.exists(path):
+                    pytesseract.pytesseract.tesseract_cmd = path
+                    logger.info(f"Tesseract found at common Linux path: {path}")
+                    return
+            logger.warning("Tesseract not found in any location")
 
 # Configure Tesseract on startup
 configure_tesseract()
@@ -69,12 +110,37 @@ def test_tesseract():
         draw = ImageDraw.Draw(test_img)
         draw.text((10, 10), "Test", fill='black')
         
+        # Log the current tesseract path for debugging
+        logger.info(f"Current tesseract_cmd path: {pytesseract.pytesseract.tesseract_cmd}")
+        
         # Try to extract text
         test_text = pytesseract.image_to_string(test_img)
         logger.info(f"Tesseract test successful. Extracted: '{test_text.strip()}'")
         return True
     except Exception as e:
         logger.error(f"Tesseract test failed: {e}")
+        system = platform.system().lower()
+        
+        if system == "windows":
+            logger.error("On Windows, make sure Tesseract OCR is installed and the path is correct")
+        else:
+            # More detailed error for Docker/Linux environments
+            logger.error("In Docker/Linux environment, verify Tesseract is installed in the container")
+            logger.error(f"Current tesseract_cmd path: {pytesseract.pytesseract.tesseract_cmd}")
+            
+            # Try to check if tesseract exists using subprocess
+            try:
+                import subprocess
+                result = subprocess.run(['ls', '-la', '/usr/bin/tesseract'], 
+                                      capture_output=True, text=True, check=False)
+                logger.error(f"Checking /usr/bin/tesseract: {result.stdout}")
+                
+                result = subprocess.run(['which', 'tesseract'], 
+                                      capture_output=True, text=True, check=False)
+                logger.error(f"Which tesseract result: {result.stdout}")
+            except Exception as sub_e:
+                logger.error(f"Failed to check tesseract installation: {sub_e}")
+                
         return False
 
 @app.post("/process_image")
@@ -385,4 +451,4 @@ async def health_check():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8001)
+    uvicorn.run(app, host="0.0.0.0", port=8002)

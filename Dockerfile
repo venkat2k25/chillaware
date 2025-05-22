@@ -1,7 +1,6 @@
-# Use Python 3.9 slim image
 FROM python:3.9-slim
 
-# Install system dependencies including Tesseract OCR
+# Install system dependencies including Tesseract OCR with all necessary libraries
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     tesseract-ocr-eng \
@@ -12,22 +11,23 @@ RUN apt-get update && apt-get install -y \
     libxext6 \
     libxrender-dev \
     libgomp1 \
+    wget \
     && rm -rf /var/lib/apt/lists/*
 
-# Set working directory
+# Verify Tesseract installation and set environment variable
+RUN which tesseract > /dev/null && \
+    echo "Tesseract installation verified" && \
+    tesseract --version && \
+    echo "export TESSERACT_PATH=\"$(which tesseract)\"" >> /etc/environment
+
 WORKDIR /app
 
-# Copy requirements file
 COPY requirements.txt .
 
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy application code
 COPY . .
 
-# Expose port
-EXPOSE 8001
+EXPOSE 8002
 
-# Run the application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8001"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8002"]
