@@ -19,7 +19,7 @@ import axios from "axios";
 
 
 
-const BACKEND_URL = "http://192.168.1.2:8001";
+const BACKEND_URL = "https://chillaware.onrender.com";
 
 export default function ScanScreen() {
   const navigation = useNavigation();
