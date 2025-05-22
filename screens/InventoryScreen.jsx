@@ -100,8 +100,8 @@ const VoiceWave = ({ isRecording, audioLevels }) => {
 
 // Recording Card Overlay Component
 const RecordingCard = ({ visible, onClose, onStopRecording, isRecording, audioLevels, itemName, recordingState }) => {
-  const slideAnim = useRef(new Animated.Value(-200)).current;
-  const pulseAnim = useRef(new Animated.Value(1)).current;
+  const slideAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (visible) {
@@ -469,8 +469,8 @@ export default function InventoryScreen() {
         Return ONLY the expiry date in YYYY-MM-DD format. If no clear expiry date is found, return "null".
         
         Examples:
-        - Input: "expires May fifteenth twenty twenty six" → Output: 2026-05-15
-        - Input: "best before June 2025" → Output: 2025-06-30
+        - Input: "expires May fifteenth twenty twenty six" → Output: 15-05-2026
+        - Input: "best before June 2025" → Output: 30-06-2025
         - Input: "expires in six months" → Output: ${new Date(Date.now() + 6*30*24*60*60*1000).toISOString().split('T')[0]}
       `;
 
