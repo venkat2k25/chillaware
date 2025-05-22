@@ -151,6 +151,20 @@ async def process_image(file: UploadFile = File(...)):
             logger.warning(f"Invalid file type uploaded: {file.content_type}")
             raise HTTPException(status_code=400, detail="Invalid file type. Please upload an image.")
 
+        # Force reconfigure Tesseract for this request to ensure it's set correctly
+        logger.info("Reconfiguring Tesseract for this request...")
+        configure_tesseract()
+        
+        # Log the current Tesseract path
+        logger.info(f"Using Tesseract path: {pytesseract.pytesseract.tesseract_cmd}")
+        
+        # For Linux/Docker environments, explicitly set a fallback path if needed
+        if platform.system().lower() != "windows" and not pytesseract.pytesseract.tesseract_cmd:
+            tesseract_path = "/usr/bin/tesseract"
+            if os.path.exists(tesseract_path):
+                pytesseract.pytesseract.tesseract_cmd = tesseract_path
+                logger.info(f"Explicitly set Tesseract path to: {tesseract_path}")
+
         contents = await file.read()
         image = Image.open(io.BytesIO(contents))
 
@@ -158,7 +172,14 @@ async def process_image(file: UploadFile = File(...)):
         try:
             # Test Tesseract first
             if not test_tesseract():
-                raise Exception("Tesseract OCR is not properly configured")
+                # One more attempt with direct path setting for Docker
+                if platform.system().lower() != "windows":
+                    pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+                    logger.info("Last resort: Setting Tesseract path directly to /usr/bin/tesseract")
+                    if not test_tesseract():
+                        raise Exception("Tesseract OCR is not properly configured despite multiple attempts")
+                else:
+                    raise Exception("Tesseract OCR is not properly configured")
                 
             extracted_text = pytesseract.image_to_string(image)
             logger.info(f"OCR extracted text (first 200 chars): {extracted_text[:200]}...")
@@ -448,6 +469,25 @@ async def health_check():
         "tesseract": tesseract_status,
         "platform": platform.system()
     }
+
+# Add a startup event to ensure Tesseract is configured when the app starts
+@app.on_event("startup")
+async def startup_event():
+    logger.info("Application startup: Configuring Tesseract OCR")
+    configure_tesseract()
+    # Test if Tesseract is working
+    if test_tesseract():
+        logger.info("Tesseract OCR is working correctly")
+    else:
+        logger.warning("Tesseract OCR is not configured correctly. Image processing may fail.")
+        # Try direct path setting for Docker environments
+        if platform.system().lower() != "windows":
+            tesseract_path = "/usr/bin/tesseract"
+            if os.path.exists(tesseract_path):
+                pytesseract.pytesseract.tesseract_cmd = tesseract_path
+                logger.info(f"Startup: Set Tesseract path directly to {tesseract_path}")
+                if test_tesseract():
+                    logger.info("Tesseract OCR is now working correctly after direct path setting")
 
 if __name__ == "__main__":
     import uvicorn
