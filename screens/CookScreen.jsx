@@ -122,7 +122,7 @@ export default function CookScreen() {
     setError(null);
 
     try {
-      const response = await fetch("http://192.168.0.215:8001/api/generate_recipes", {
+      const response = await fetch("http://192.168.1.2:8001/api/generate_recipes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -187,7 +187,7 @@ export default function CookScreen() {
                 { backgroundColor: item.color },
               ]}
             >
-              <Ionicons name={item.icon} size={24} color={Colors.background} />
+              <Ionicons name={item.icon} size={24} color="white" />
             </View>
             <Text style={styles.foodTypeName}>{item.name}</Text>
             <Ionicons
@@ -207,7 +207,7 @@ export default function CookScreen() {
   const renderServingsSelection = () => (
     <View style={styles.stepContainer}>
       <TouchableOpacity onPress={handleBack} style={styles.backButton}>
-        <Ionicons name="arrow-back" size={20} color={Colors.background} />
+        <Ionicons name="arrow-back" size={20} color={Colors.primary} />
       </TouchableOpacity>
 
       <View style={styles.servingsContainer}>
@@ -223,7 +223,7 @@ export default function CookScreen() {
               style={styles.servingsButton}
               onPress={() => handleServingsChange(servings - 1)}
             >
-              <Ionicons name="remove" size={20} color={Colors.background} />
+              <Ionicons name="remove" size={20} color={Colors.primary} />
             </TouchableOpacity>
 
             <Text style={styles.servingsValue}>{servings}</Text>
@@ -232,7 +232,7 @@ export default function CookScreen() {
               style={styles.servingsButton}
               onPress={() => handleServingsChange(servings + 1)}
             >
-              <Ionicons name="add" size={20} color={Colors.background} />
+              <Ionicons name="add" size={20} color={Colors.primary} />
             </TouchableOpacity>
           </View>
 
@@ -516,13 +516,13 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.text,
+    color: Colors.bg,
   },
   foodTypeArrow: {
     marginLeft: 8,
   },
   backButton: {
-    backgroundColor: Colors.text,
+    backgroundColor: Colors.bg,
     padding: 10,
     borderRadius: 50,
     marginBottom: 20,
@@ -561,7 +561,7 @@ const styles = StyleSheet.create({
   servingsTitle: {
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.text,
+    color: Colors.bg,
     marginBottom: 24,
     zIndex: 1,
   },
@@ -576,7 +576,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 24,
-    backgroundColor: Colors.text + "50",
+    backgroundColor: Colors.bg + "40",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -592,14 +592,14 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: Colors.text + "90",
+    backgroundColor: Colors.bg + "90",
     width: "100%",
     zIndex: 1,
   },
   generateButtonText: {
     fontSize: 18,
     fontWeight: "500",
-    color: Colors.background
+    color: Colors.primary,
   },
   loadingContainer: {
     flex: 1,
