@@ -1,2 +1,5 @@
-fastapi
-uvicorn
+fastapi[all]
+uvicorn[standard]
+pytesseract
+Pillow
+requests
