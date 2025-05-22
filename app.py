@@ -8,6 +8,8 @@ import json
 import logging
 from datetime import datetime
 import re
+import os
+import platform
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,11 +27,55 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-pytesseract.pytesseract.tesseract_cmd = "/usr/bin/tesseract"
+# Configure Tesseract path based on environment
+def configure_tesseract():
+    """Configure Tesseract OCR path based on the operating system"""
+    system = platform.system().lower()
+    
+    if system == "windows":
+        # Windows path
+        tesseract_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+        if os.path.exists(tesseract_path):
+            pytesseract.pytesseract.tesseract_cmd = tesseract_path
+            logger.info(f"Tesseract configured for Windows: {tesseract_path}")
+        else:
+            logger.warning("Tesseract not found at default Windows path")
+    else:
+        # Linux/Docker - tesseract should be in PATH
+        try:
+            # Test if tesseract is available in PATH
+            import subprocess
+            result = subprocess.run(['which', 'tesseract'], 
+                                  capture_output=True, text=True, check=True)
+            tesseract_path = result.stdout.strip()
+            pytesseract.pytesseract.tesseract_cmd = tesseract_path
+            logger.info(f"Tesseract found in PATH: {tesseract_path}")
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            logger.warning("Tesseract not found in PATH")
+
+# Configure Tesseract on startup
+configure_tesseract()
 
 # Gemini API configuration
 GEMINI_API_KEY = "AIzaSyD57P0SmXEGmRorqT9qh2ngZ8Cgnbt-wAk"
 GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+
+def test_tesseract():
+    """Test if Tesseract is working properly"""
+    try:
+        # Create a simple test image with text
+        from PIL import Image, ImageDraw, ImageFont
+        test_img = Image.new('RGB', (200, 50), color='white')
+        draw = ImageDraw.Draw(test_img)
+        draw.text((10, 10), "Test", fill='black')
+        
+        # Try to extract text
+        test_text = pytesseract.image_to_string(test_img)
+        logger.info(f"Tesseract test successful. Extracted: '{test_text.strip()}'")
+        return True
+    except Exception as e:
+        logger.error(f"Tesseract test failed: {e}")
+        return False
 
 @app.post("/process_image")
 async def process_image(file: UploadFile = File(...)):
@@ -44,6 +90,10 @@ async def process_image(file: UploadFile = File(...)):
 
         logger.info("Attempting to extract text using OCR...")
         try:
+            # Test Tesseract first
+            if not test_tesseract():
+                raise Exception("Tesseract OCR is not properly configured")
+                
             extracted_text = pytesseract.image_to_string(image)
             logger.info(f"OCR extracted text (first 200 chars): {extracted_text[:200]}...")
             if not extracted_text.strip():
@@ -54,8 +104,8 @@ async def process_image(file: UploadFile = File(...)):
         except Exception as e:
             logger.error(f"Error during OCR processing: {e}")
             error_message = str(e)
-            if "tesseract is not installed" in error_message or "tesseract_cmd" in error_message:
-                detail = "OCR service could not be initialized. Please ensure Tesseract is installed and restart the server."
+            if "tesseract" in error_message.lower() or "not properly configured" in error_message:
+                detail = "OCR service is not available. The image processing feature requires Tesseract OCR to be installed."
             else:
                 detail = f"Error processing the image: {error_message}. Please try again with a different image."
             raise HTTPException(status_code=500, detail=detail)
@@ -325,7 +375,13 @@ Output format (ONLY the JSON array):
 @app.get("/health")
 async def health_check():
     logger.info("Health check endpoint called.")
-    return {"status": "healthy"}
+    # Test Tesseract availability
+    tesseract_status = "available" if test_tesseract() else "unavailable"
+    return {
+        "status": "healthy",
+        "tesseract": tesseract_status,
+        "platform": platform.system()
+    }
 
 if __name__ == "__main__":
     import uvicorn
