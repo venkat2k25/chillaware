@@ -19,7 +19,7 @@ import axios from "axios";
 
 
 
-const BACKEND_URL = "https://chillaware.onrender.com";
+const BACKEND_URL = "https://chillaware-backend.onrender.com";
 
 export default function ScanScreen() {
   const navigation = useNavigation();
@@ -51,11 +51,11 @@ export default function ScanScreen() {
       quality: 0.7,
     });
     if (!result.canceled && result.assets?.[0]?.uri) {
-      const image = result.assets[0];
-      setPhoto(image);
+      const img = result.assets[0];
+      setPhoto(img);
       setIsUploaded(false);
       setInventory(null);
-      uploadToBackend(image);
+      uploadToBackend(img);
     }
   };
 
@@ -65,38 +65,40 @@ export default function ScanScreen() {
       quality: 0.7,
     });
     if (!result.canceled && result.assets?.[0]?.uri) {
-      const image = result.assets[0];
-      setPhoto(image);
+      const img = result.assets[0];
+      setPhoto(img);
       setIsUploaded(false);
       setInventory(null);
-      uploadToBackend(image);
+      uploadToBackend(img);
     }
   };
 
   // Function to upload the selected/captured image to the backend
-  const uploadToBackend = async (image) => {
-    const data = new FormData();
-    data.append("file", {
-      uri: image.uri,
-      type: "image/jpeg",
-      name: `photo_${Date.now()}.jpg`,
-    });
+const uploadToBackend = async (img) => {
+  const image = new FormData();
+  image.append("image", {
+    uri: img.uri,
+    type: "image/jpeg",
+    name: `photo_${Date.now()}.jpg`,
+  });
 
-    try {
-      setLoadingInventory(true);
-      const backendRes = await axios.post(
-        `${BACKEND_URL}/process_image`,
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-          timeout: 45000,
-        }
-      );
-      setLoadingInventory(false);
-      setIsUploaded(true);
-      if (
+  try {
+    setLoadingInventory(true);
+    const backendRes = await axios.post(
+      "https://chillaware-backend.onrender.com/api/upload",
+      image,
+      {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        timeout: 45000,
+      }
+    );
+
+    console.log("Inventory Detection:", backendRes.data);
+    setIsUploaded(true);
+    setLoadingInventory(false);
+  if (
         backendRes.data?.inventory &&
         Array.isArray(backendRes.data.inventory) &&
         backendRes.data.inventory.length > 0
@@ -142,6 +144,7 @@ export default function ScanScreen() {
       setIsUploaded(false);
     }
   };
+
 
   // Function to save the extracted inventory items to AsyncStorage
   const saveToInventory = async (inventoryToSave) => {
