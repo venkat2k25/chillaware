@@ -17,9 +17,28 @@ import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
 import axios from "axios";
 
-
-
 const BACKEND_URL = "https://chillaware-backend.onrender.com";
+
+// Define category mapping for parent and subcategories
+const categoryMapping = {
+  "CRAVENDALE WHOLE": { parent: "Milk", sub: "Whole Milk" },
+  "JS DOUBLE CREAM": { parent: "Milk", sub: "Cream" },
+  "OATLY DRINK WHOLE": { parent: "Milk", sub: "Plant-Based Milk" },
+  "xJS STRAWB LACES": { parent: "Snacks", sub: "Candy" },
+  "GRAZE PROTN NUT 118": { parent: "Snacks", sub: "Nuts" },
+  "*CDBRY OREO BITES": { parent: "Snacks", sub: "Chocolate" },
+  "BRITISH STRAWBS": { parent: "Fruit", sub: "Berries" },
+  "JS LARGE FGGS X6": { parent: "Eggs", sub: "Large Eggs" },
+  "WARBS BRIOCHE ROLLS": { parent: "Bakery", sub: "Rolls" },
+  // Default for unmapped items
+  Dairy: { parent: "Milk", sub: "General Dairy" },
+  Beverage: { parent: "Milk", sub: "Plant-Based Milk" },
+  Candy: { parent: "Snacks", sub: "Candy" },
+  Snacks: { parent: "Snacks", sub: "General Snacks" },
+  Fruit: { parent: "Fruit", sub: "General Fruit" },
+  Eggs: { parent: "Eggs", sub: "General Eggs" },
+  Bakery: { parent: "Bakery", sub: "General Bakery" },
+};
 
 export default function ScanScreen() {
   const navigation = useNavigation();
@@ -73,38 +92,36 @@ export default function ScanScreen() {
     }
   };
 
-  // Function to upload the selected/captured image to the backend
-const uploadToBackend = async (img) => {
-  const image = new FormData();
-  image.append("image", {
-    uri: img.uri,
-    type: "image/jpeg",
-    name: `photo_${Date.now()}.jpg`,
-  });
+  const uploadToBackend = async (img) => {
+    const image = new FormData();
+    image.append("image", {
+      uri: img.uri,
+      type: "image/jpeg",
+      name: `photo_${Date.now()}.jpg`,
+    });
 
-  try {
-    setLoadingInventory(true);
-    const backendRes = await axios.post(
-      "https://chillaware-backend.onrender.com/api/upload",
-      image,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-        timeout: 45000,
-      }
-    );
+    try {
+      setLoadingInventory(true);
+      const backendRes = await axios.post(
+        `${BACKEND_URL}/api/upload`,
+        image,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+          timeout: 45000,
+        }
+      );
 
-    console.log("Inventory Detection:", backendRes.data);
-    setIsUploaded(true);
-    setLoadingInventory(false);
-  if (
+      console.log("Inventory Detection:", backendRes.data);
+      setIsUploaded(true);
+      setLoadingInventory(false);
+      if (
         backendRes.data?.inventory &&
         Array.isArray(backendRes.data.inventory) &&
         backendRes.data.inventory.length > 0
       ) {
         setInventory(backendRes.data.inventory);
-        // Automatically save to inventory
         await saveToInventory(backendRes.data.inventory);
       } else {
         setInventory([]);
@@ -145,8 +162,6 @@ const uploadToBackend = async (img) => {
     }
   };
 
-
-  // Function to save the extracted inventory items to AsyncStorage
   const saveToInventory = async (inventoryToSave) => {
     if (!inventoryToSave || inventoryToSave.length === 0) {
       Alert.alert("No items to save", "There are no extracted items to add to your inventory.");
@@ -158,13 +173,25 @@ const uploadToBackend = async (img) => {
     try {
       const existingData = await AsyncStorage.getItem("inventory");
       let inventoryData = existingData ? JSON.parse(existingData) : [];
-      const itemsToSave = inventoryToSave.map((item) => ({
-        item: item.item || "Unknown Item",
-        quantity: item.quantity || 1,
-        weight: item.weight || "",
-        purchase_date: item.purchase_date || new Date().toISOString().split("T")[0],
-        expiry_date: item.expiry_date || "",
-      }));
+      const itemsToSave = inventoryToSave.map((item) => {
+        const itemName = item.item || "Unknown Item";
+        // First, try to match by item name; if not found, fall back to category
+        const mappedCategory =
+          categoryMapping[itemName] ||
+          categoryMapping[item.category] || {
+            parent: "Unknown Category",
+            sub: "Unknown Subcategory",
+          };
+        return {
+          item: itemName,
+          quantity: item.quantity || 1,
+          weight: item.weight || "",
+          purchase_date: item.purchase_date || new Date().toISOString().split("T")[0],
+          expiry_date: item.expiry_date || "",
+          parentCategory: mappedCategory.parent,
+          subCategory: mappedCategory.sub,
+        };
+      });
       inventoryData = [...inventoryData, ...itemsToSave];
       await AsyncStorage.setItem("inventory", JSON.stringify(inventoryData));
       Alert.alert("Success", `${itemsToSave.length} item(s) added to inventory successfully`);
