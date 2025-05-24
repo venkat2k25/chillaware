@@ -27,6 +27,7 @@
       "favicon": "./assets/icons/Logo.png"
     },
     "plugins": [
+      "expo-dev-client",
       [
         "expo-speech-recognition",
         {
