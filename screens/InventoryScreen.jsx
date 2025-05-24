@@ -14,7 +14,7 @@ import {
   Modal,
   Image,
 } from "react-native";
-import placeholderImage from '../assets/empty.jpg'
+import placeholderImage from '../assets/empty.jpg';
 import Svg, { Path, Line } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
@@ -23,9 +23,7 @@ import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-
-
-// Voice Wave Visualization Component
+// VoiceWave Component
 const VoiceWave = ({ isRecording, audioLevels }) => {
   const animatedValues = useRef(
     Array.from({ length: 15 }, () => new Animated.Value(0.2))
@@ -78,7 +76,7 @@ const VoiceWave = ({ isRecording, audioLevels }) => {
                 inputRange: [0, 1],
                 outputRange: [6, 35],
               }),
-              backgroundColor: isRecording ? Colors.bg: Colors.background,
+              backgroundColor: isRecording ? Colors.bg : Colors.background,
               opacity: isRecording ? 1 : 0.5,
             },
           ]}
@@ -88,7 +86,7 @@ const VoiceWave = ({ isRecording, audioLevels }) => {
   );
 };
 
-// Recording Card Overlay Component
+// RecordingCard Component
 const RecordingCard = ({
   visible,
   onClose,
@@ -210,57 +208,57 @@ const RecordingCard = ({
   );
 };
 
-
-const foodItem =[
+// FoodItem Array
+const foodItem = [
   {
-    "name": "eggs",
-    "link": "https://images.pexels.com/photos/4045561/pexels-photo-4045561.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+    name: "eggs",
+    link: "https://images.pexels.com/photos/4045561/pexels-photo-4045561.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
   },
   {
-    "name": "milk",
-    "link": "https://images.pexels.com/photos/2198626/pexels-photo-2198626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    name: "milk",
+    link: "https://images.pexels.com/photos/2198626/pexels-photo-2198626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
   },
   {
-    "name": "bread",
-    "link": "https://assets.bonappetit.com/photos/5c62e4a3e81bbf522a9579ce/1:1/w_1920,c_limit/milk-bread.jpg"
+    name: "bread",
+    link: "https://assets.bonappetit.com/photos/5c62e4a3e81bbf522a9579ce/1:1/w_1920,c_limit/milk-bread.jpg",
   },
   {
-    "name": "double cream",
-    "link": "https://www.spar.co.uk/media/lttcmxsg/5bbc048c-7bfb-4acf-a0e1-7f5243bc2ab1.jpg?anchor=center&mode=crop&heightratio=1&width=720&format=webp&quality=80&rnd=133051920326000000"
+    name: "double cream",
+    link: "https://www.spar.co.uk/media/lttcmxsg/5bbc048c-7bfb-4acf-a0e1-7f5243bc2ab1.jpg?anchor=center&mode=crop&heightratio=1&width=720&format=webp&quality=80&rnd=133051920326000000",
   },
   {
-    "name": "sweetcorn",
-    "link": "https://images.pexels.com/photos/547263/pexels-photo-547263.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+    name: "sweetcorn",
+    link: "https://images.pexels.com/photos/547263/pexels-photo-547263.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
   },
   {
-    "name": "green pesto",
-    "link": "https://theviewfromgreatisland.com/wp-content/uploads/2022/08/basil-pesto-Genovese-3132-August-28-2022-2.jpg"
+    name: "green pesto",
+    link: "https://theviewfromgreatisland.com/wp-content/uploads/2022/08/basil-pesto-Genovese-3132-August-28-2022-2.jpg",
   },
   {
-    "name": "moroccan salmon",
-    "link": "https://www.feastingathome.com/wp-content/uploads/2016/02/moroccan-salmon-106-1.jpg"
+    name: "moroccan salmon",
+    link: "https://www.feastingathome.com/wp-content/uploads/2016/02/moroccan-salmon-106-1.jpg",
   },
   {
-    "name": "carrot",
-    "link": "https://t4.ftcdn.net/jpg/02/28/90/67/360_F_228906712_r4bb71gSmKvyDHq54JvjXAhKWpQiqWvX.jpg"
+    name: "carrot",
+    link: "https://t4.ftcdn.net/jpg/02/28/90/67/360_F_228906712_r4bb71gSmKvyDHq54JvjXAhKWpQiqWvX.jpg",
   },
   {
-    "name": "avocado",
-    "link": "https://nutritionsource.hsph.harvard.edu/wp-content/uploads/2022/04/pexels-antonio-filigno-8538296-1024x657.jpg"
+    name: "avocado",
+    link: "https://nutritionsource.hsph.harvard.edu/wp-content/uploads/2022/04/pexels-antonio-filigno-8538296-1024x657.jpg",
   },
   {
-    "name": "tomato",
-    "link": "https://t4.ftcdn.net/jpg/03/27/96/23/360_F_327962332_6mb5jQLnTOjhYeXML7v45Hc5eED2GYOD.jpg"
+    name: "tomato",
+    link: "https://t4.ftcdn.net/jpg/03/27/96/23/360_F_327962332_6mb5jQLnTOjhYeXML7v45Hc5eED2GYOD.jpg",
   },
   {
-    "name": "yoghurt",
-    "link": "https://images.getrecipekit.com/20240109191538-homemade-yogurt.jpg?width=650&quality=90&"
+    name: "yoghurt",
+    link: "https://images.getrecipekit.com/20240109191538-homemade-yogurt.jpg?width=650&quality=90&",
   },
   {
-    "name": "cucumber",
-    "link": "https://th.bing.com/th/id/OIP.VKG1qNp4bQnOTWVzO1DJiwHaEo?cb=iwp2&rs=1&pid=ImgDetMain"
-  }
-]
+    name: "cucumber",
+    link: "https://th.bing.com/th/id/OIP.VKG1qNp4bQnOTWVzO1DJiwHaEo?cb=iwp2&rs=1&pid=ImgDetMain",
+  },
+];
 
 // ProductCard Component
 const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
@@ -268,7 +266,7 @@ const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
   const formattedDate = date.toLocaleDateString('default', {
     day: 'numeric',
     month: 'long',
-    year: 'numeric'
+    year: 'numeric',
   });
 
   const match = foodItem.find((food) =>
@@ -278,58 +276,114 @@ const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
   return (
     <View style={styles.productCard}>
       <Image
-         source={match ? { uri: match.link } : placeholderImage}
+        source={match ? { uri: match.link } : placeholderImage}
         style={styles.productImage}
         resizeMode="cover"
       />
       <View style={{ flex: 1, justifyContent: 'space-between' }}>
-      <Text style={styles.productName} numberOfLines={2}>
-        {item.productName} ({item.quantity})
-      </Text>
-      {item.weight !== "N/A" && (
-        <Text style={styles.productDetail}>📟 {item.weight}</Text>
-      )}
-      <Text style={styles.productDetail}>🛒 {formattedDate}</Text>
-      {item.expiryDate !== "N/A" && (() => {
-      const date = new Date(item.expiryDate);
-      const formattedDate = date.toLocaleDateString('default', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-      });
-      return <Text style={styles.productDetail}>⏰ {formattedDate}</Text>;
-    })()}
-
-
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={[
-            styles.micIconContainer,
-            recordingState === "recording" && styles.micRecording,
-          ]}
-          onPress={onMicPress}
-          disabled={recordingState === "processing"}
-        >
-          {recordingState === "processing" ? (
-            <ActivityIndicator size={12} color={Colors.background} />
-          ) : (
-            <Ionicons
-              name={recordingState === "recording" ? "stop" : "mic"}
-              size={12}
-              color={Colors.background}
-            />
-          )}
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.deleteIconContainer}
-          onPress={onDeletePress}
-        >
-          <Ionicons name="trash-outline" size={12} color={Colors.text} />
-        </TouchableOpacity>
+        <Text style={styles.productName} numberOfLines={2}>
+          {item.productName} ({item.quantity})
+        </Text>
+        {item.weight !== "N/A" && (
+          <Text style={styles.productDetail}>📟 {item.weight}</Text>
+        )}
+        <Text style={styles.productDetail}>🛒 {formattedDate}</Text>
+        {item.expiryDate !== "N/A" && (() => {
+          const date = new Date(item.expiryDate);
+          const formattedDate = date.toLocaleDateString('default', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric',
+          });
+          return <Text style={styles.productDetail}>⏰ {formattedDate}</Text>;
+        })()}
+        <View style={styles.actionButtons}>
+          <TouchableOpacity
+            style={[
+              styles.micIconContainer,
+              recordingState === "recording" && styles.micRecording,
+            ]}
+            onPress={onMicPress}
+            disabled={recordingState === "processing"}
+          >
+            {recordingState === "processing" ? (
+              <ActivityIndicator size={12} color={Colors.background} />
+            ) : (
+              <Ionicons
+                name={recordingState === "recording" ? "stop" : "mic"}
+                size={12}
+                color={Colors.background}
+              />
+            )}
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.deleteIconContainer}
+            onPress={onDeletePress}
+          >
+            <Ionicons name="trash-outline" size={12} color={Colors.text} />
+          </TouchableOpacity>
         </View>
       </View>
     </View>
   );
+};
+
+// Subcategory JSON
+const subcategories = {
+  "🥦 Vegetarian": {
+    "Leafy Vegetables": ["Spinach", "Lettuce", "Kale", "Cabbage"],
+    "Root Vegetables": ["Carrot", "Potato", "Beetroot", "Radish"],
+    "Cruciferous Vegetables": ["Broccoli", "Cauliflower", "Brussels Sprouts"],
+    "Other Vegetables": ["Cucumber", "Onion", "Tomato", "Bell Pepper", "Zucchini", "Aubergine"],
+  },
+  "🍗 Non-Vegetarian": {
+    "Poultry": ["Chicken Breast", "Chicken Thigh", "Turkey"],
+    "Red Meat": ["Beef", "Lamb", "Pork"],
+    "Seafood": ["Salmon", "Tuna", "Shrimp", "Crab"],
+    "Eggs": ["Chicken Eggs", "Quail Eggs", "Eggs"],
+  },
+  "🥛 Dairy Products": {
+    "Milk": ["Whole Milk", "Skim Milk", "Almond Milk", "Soy Milk", "Oat Milk"],
+    "Cheese": ["Cheddar", "Mozzarella", "Parmesan", "Cream Cheese"],
+    "Yogurt": ["Plain Yogurt", "Greek Yogurt", "Flavored Yogurt", "Yoghurt"],
+    "Butter & Cream": ["Salted Butter", "Unsalted Butter", "Heavy Cream", "Double Cream"],
+  },
+  "🧃 Drinks & Beverages": {
+    "Soft Drinks": ["Cola", "Lemonade", "Ginger Ale"],
+    "Juices": ["Orange Juice", "Apple Juice", "Mango Juice"],
+    "Tea & Coffee": ["Green Tea", "Black Coffee", "Herbal Tea"],
+    "Alcoholic Beverages": ["Beer", "Wine", "Whiskey"],
+    "Water": ["Still Water", "Sparkling Water"],
+  },
+  "🍿 Snacks": {
+    "Chips & Crisps": ["Potato Chips", "Tortilla Chips", "Pita Chips"],
+    "Nuts & Seeds": ["Almonds", "Cashews", "Sunflower Seeds", "Nuts"],
+    "Popcorn": ["Butter Popcorn", "Caramel Popcorn"],
+    "Candy & Sweets": ["Chocolate Bars", "Gummies", "Hard Candy", "Caramel", "Strawberry Laces", "Oreo"],
+  },
+  "🌿 Greens & Herbs": {
+    "Fresh Herbs": ["Basil", "Cilantro", "Parsley", "Mint"],
+    "Salad Greens": ["Arugula", "Romaine", "Mixed Greens", "Spinach"],
+    "Microgreens": ["Pea Shoots", "Radish Sprouts", "Sunflower Sprouts"],
+  },
+  "🧂 Condiments & Essentials": {
+    "Sauces": ["Ketchup", "Mustard", "Soy Sauce", "Hot Sauce", "Pesto", "Houmous"],
+    "Spices": ["Black Pepper", "Cumin", "Paprika", "Turmeric"],
+    "Oils": ["Olive Oil", "Vegetable Oil", "Coconut Oil"],
+    "Vinegars": ["Balsamic Vinegar", "Apple Cider Vinegar", "White Vinegar"],
+  },
+  "🌾 Grains & Staples": {
+    "Rice": ["White Rice", "Brown Rice", "Basmati Rice", "Quinoa"],
+    "Pasta": ["Spaghetti", "Penne", "Fusilli", "Noodles"],
+    "Flours": ["All-Purpose Flour", "Whole Wheat Flour", "Almond Flour"],
+    "Legumes": ["Lentils", "Chickpeas", "Black Beans", "Mixed Pulses", "Green Pea"],
+  },
+  "🥐 Bakery & Breakfast Items": {
+    "Bread": ["White Bread", "Sourdough", "Whole Grain Bread", "Rye Bread", "Brioche", "Multigrain Thins"],
+    "Pastries": ["Croissant", "Danish", "Muffin"],
+    "Cereals": ["Oatmeal", "Corn Flakes", "Granola"],
+    "Breakfast Spreads": ["Peanut Butter", "Jam", "Honey", "Maple"],
+  },
 };
 
 const GEMINI_API_KEY = "AIzaSyD57P0SmXEGmRorqT9qh2ngZ8Cgnbt-wAk";
@@ -350,32 +404,19 @@ export default function InventoryScreen() {
   const numColumns = 1;
 
   // State for category filters
-  const [expandedCategories, setExpandedCategories] = useState({});
-  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
-  const [categories, setCategories] = useState({});
+  const [selected, setSelected] = useState([]);
 
-
-  const category =[
-  "🥦 Vegetarian",
-  "🍗 Non-Vegetarian",
-  "🥛 Dairy Products",
-  "🧃 Drinks & Beverages",
-  "🍿 Snacks",
-  "🌿 Greens & Herbs",
-  "🧂 Condiments & Essentials",
-  "🌾 Grains & Staples",
-  "🥐 Bakery & Breakfast Items"
-]
-
- const [selected, setSelected] = useState([]);
-
-  const toggleCategory = (category) => {
-    setSelected((prev) =>
-      prev.includes(category)
-        ? prev.filter((item) => item !== category)
-        : [...prev, category]
-    );
-  };
+  const category = [
+    "🥦 Vegetarian",
+    "🍗 Non-Vegetarian",
+    "🥛 Dairy Products",
+    "🧃 Drinks & Beverages",
+    "🍿 Snacks",
+    "🌿 Greens & Herbs",
+    "🧂 Condiments & Essentials",
+    "🌾 Grains & Staples",
+    "🥐 Bakery & Breakfast Items",
+  ];
 
   useEffect(() => {
     loadInventoryData();
@@ -400,41 +441,81 @@ export default function InventoryScreen() {
     }
   };
 
+  const assignCategoryAndSubcategory = (itemName) => {
+    let parentCategory = "Unknown Category";
+    let subCategory = "Unknown Subcategory";
+
+    // Normalize itemName for matching
+    const normalizedItem = itemName.toLowerCase().replace(/[^a-z0-9\s]/g, '');
+
+    // Search through subcategories
+    for (const [parent, subCats] of Object.entries(subcategories)) {
+      for (const [subCat, items] of Object.entries(subCats)) {
+        if (
+          items.some((subItem) =>
+            normalizedItem.includes(subItem.toLowerCase().replace(/[^a-z0-9\s]/g, ''))
+          ) ||
+          normalizedItem.includes(subCat.toLowerCase().replace(/[^a-z0-9\s]/g, ''))
+        ) {
+          parentCategory = parent;
+          subCategory = subCat;
+          return { parentCategory, subCategory };
+        }
+      }
+    }
+
+    // Fallback mappings for specific items
+    if (normalizedItem.includes("strawbs") || normalizedItem.includes("strawberry")) {
+      parentCategory = "🥦 Vegetarian";
+      subCategory = "Other Vegetables";
+    } else if (normalizedItem.includes("tofu")) {
+      parentCategory = "🥦 Vegetarian";
+      subCategory = "Other Vegetables";
+    } else if (normalizedItem.includes("apple")) {
+      parentCategory = "🥦 Vegetarian";
+      subCategory = "Other Vegetables";
+    } else if (normalizedItem.includes("banana")) {
+      parentCategory = "🥦 Vegetarian";
+      subCategory = "Other Vegetables";
+    }
+
+    return { parentCategory, subCategory };
+  };
+
   const loadInventoryData = async () => {
     try {
       const data = await AsyncStorage.getItem("inventory");
       if (data) {
         const parsedData = JSON.parse(data);
         console.log("Loaded inventory:", parsedData);
-        const formattedData = parsedData.map((item, index) => ({
-          id: index.toString(),
-          productName: item.item || "Unknown Item",
-          quantity: item.quantity || 0,
-          purchaseDate: item.purchase_date || "Unknown Date",
-          weight: item.weight || "N/A",
-          expiryDate: item.expiry_date || "N/A",
-          parentCategory: item.parentCategory || "Unknown Category",
-          subCategory: item.subCategory || "Unknown Subcategory",
-          originalIndex: index,
-        }));
-
-        // Group items by parentCategory and subCategory
-        const categoryMap = {};
-        formattedData.forEach((item) => {
-          if (!categoryMap[item.parentCategory]) {
-            categoryMap[item.parentCategory] = new Set();
-          }
-          categoryMap[item.parentCategory].add(item.subCategory);
+        const formattedData = parsedData.map((item, index) => {
+          const { parentCategory, subCategory } = assignCategoryAndSubcategory(item.item);
+          return {
+            id: index.toString(),
+            productName: item.item || "Unknown Item",
+            quantity: item.quantity || 0,
+            purchaseDate: item.purchase_date || "Unknown Date",
+            weight: item.weight || "N/A",
+            expiryDate: item.expiry_date || "N/A",
+            parentCategory: item.parentCategory || parentCategory,
+            subCategory: item.subCategory || subCategory,
+            originalIndex: index,
+          };
         });
 
-        // Convert Sets to Arrays for rendering
-        const categoryStructure = {};
-        Object.keys(categoryMap).forEach((parent) => {
-          categoryStructure[parent] = Array.from(categoryMap[parent]);
-        });
-
-        setCategories(categoryStructure);
         setInventoryData(formattedData);
+
+        // Update AsyncStorage with assigned categories
+        const updatedData = formattedData.map((item) => ({
+          item: item.productName,
+          quantity: item.quantity,
+          purchase_date: item.purchaseDate,
+          weight: item.weight,
+          expiry_date: item.expiryDate,
+          parentCategory: item.parentCategory,
+          subCategory: item.subCategory,
+        }));
+        await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
       }
     } catch (err) {
       console.error("Failed to load inventory data:", err);
@@ -731,7 +812,6 @@ export default function InventoryScreen() {
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ Deepgram API error response:", errorText);
-
         console.log("🔄 Trying alternative audio format...");
         return await transcribeAudioAlternative(audioUri);
       }
@@ -896,27 +976,29 @@ export default function InventoryScreen() {
     }
   };
 
-  // Toggle parent category expansion
-  // const toggleCategory = (parentCategory) => {
-  //   setExpandedCategories((prev) => ({
-  //     ...prev,
-  //     [parentCategory]: !prev[parentCategory],
-  //   }));
-  // };
-
-  // Handle subcategory selection
-  const selectSubCategory = (subCategory) => {
-    setSelectedSubCategory(subCategory === selectedSubCategory ? null : subCategory);
+  const toggleCategory = (category) => {
+    setSelected((prev) =>
+      prev.includes(category)
+        ? prev.filter((item) => item !== category)
+        : [...prev, category]
+    );
   };
 
-  // Filter inventory data based on search query and selected subcategory
+
+  // Filter inventory data based on search query and selected categories
   const filteredData = inventoryData.filter((item) => {
     const matchesSearch = item.productName
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedSubCategory
-      ? item.subCategory === selectedSubCategory
-      : true;
+
+    // If no categories are selected, show all items that match the search query
+    if (selected.length === 0) {
+      return matchesSearch;
+    }
+
+    // Check if the item's parentCategory is in the selected categories
+    const matchesCategory = selected.includes(item.parentCategory);
+
     return matchesSearch && matchesCategory;
   });
 
@@ -953,71 +1035,30 @@ export default function InventoryScreen() {
           />
         </View>
 
-        {/* Category Filter Section */}
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
           style={[styles.categoryScroll, { marginRight: -15 }]}
         >
-         {category.map((cat, index) => (
-        <TouchableOpacity
-          key={index}
-          onPress={() => toggleCategory(cat)}
-          style={[
-            styles.button,
-            selected.includes(cat) ? styles.selected : styles.unselected
-          ]}
-        >
-          <Text style={[
-                styles.buttonText,
-                 selected.includes(cat) ? styles.selected : styles.unselected,
-              ]}>{cat}</Text>
-        </TouchableOpacity>
-      ))}
-          {/* {Object.keys(categories).map((parentCategory) => (
-            <View key={parentCategory} style={styles.categoryContainer}>
-              <TouchableOpacity
-                style={styles.parentCategoryButton}
-                onPress={() => toggleCategory(parentCategory)}
+          {category.map((cat, index) => (
+            <TouchableOpacity
+              key={index}
+              onPress={() => toggleCategory(cat)}
+              style={[
+                styles.button,
+                selected.includes(cat) ? styles.selected : styles.unselected,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.buttonText,
+                  selected.includes(cat) ? styles.selectedText : styles.unselectedText,
+                ]}
               >
-                <Text style={styles.parentCategoryText}>{parentCategory}</Text>
-                <Ionicons
-                  name={
-                    expandedCategories[parentCategory]
-                      ? "chevron-up"
-                      : "chevron-down"
-                  }
-                  size={16}
-                  color={Colors.text}
-                />
-              </TouchableOpacity>
-              {expandedCategories[parentCategory] && (
-                <View style={styles.subCategoryContainer}>
-                  {categories[parentCategory].map((subCategory) => (
-                    <TouchableOpacity
-                      key={subCategory}
-                      style={[
-                        styles.subCategoryButton,
-                        selectedSubCategory === subCategory &&
-                          styles.subCategoryButtonSelected,
-                      ]}
-                      onPress={() => selectSubCategory(subCategory)}
-                    >
-                      <Text
-                        style={[
-                          styles.subCategoryText,
-                          selectedSubCategory === subCategory &&
-                            styles.subCategoryTextSelected,
-                        ]}
-                      >
-                        {subCategory}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              )}
-            </View>
-          ))} */}
+                {cat}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </ScrollView>
 
         {inventoryData.length === 0 ? (
@@ -1088,47 +1129,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 4,
   },
-  categoryScroll: {
-    marginBottom: 20,
-  },
-  categoryContainer: {
-    marginRight: 15,
-  },
-  parentCategoryButton: {
+  categoryHeader: {
     flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: Colors.primary,
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
+    marginBottom: 10,
   },
-  parentCategoryText: {
-    fontSize: 14,
+  categoryHeaderText: {
+    fontSize: 16,
     fontWeight: "600",
-    color: Colors.blue,
-    marginRight: 5,
-  },
-  subCategoryContainer: {
-    marginTop: 10,
-    paddingLeft: 10,
-  },
-  subCategoryButton: {
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 15,
-    backgroundColor: Colors.card,
-    marginBottom: 5,
-  },
-  subCategoryButtonSelected: {
-    backgroundColor: Colors.text,
-  },
-  subCategoryText: {
-    fontSize: 12,
     color: Colors.text,
   },
-  subCategoryTextSelected: {
+  deselectButton: {
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    backgroundColor: Colors.error,
+    borderRadius: 15,
+  },
+  deselectButtonText: {
+    fontSize: 12,
     color: Colors.background,
     fontWeight: "600",
+  },
+  categoryScroll: {
+    marginBottom: 20,
   },
   listContent: {
     paddingBottom: 100,
@@ -1168,10 +1192,10 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: 'row',
-    justifyContent: "flex-end", 
-  gap: 10,
-  marginTop: 10,
-  alignSelf: "flex-end", 
+    justifyContent: "flex-end",
+    gap: 10,
+    marginTop: 10,
+    alignSelf: "flex-end",
   },
   micIconContainer: {
     backgroundColor: Colors.text,
@@ -1292,7 +1316,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 5,
   },
-   button: {
+  button: {
     paddingVertical: 10,
     paddingHorizontal: 14,
     borderRadius: 25,
@@ -1300,14 +1324,18 @@ const styles = StyleSheet.create({
   },
   selected: {
     backgroundColor: Colors.text,
-    color: Colors.background,
   },
   unselected: {
     backgroundColor: Colors.bg,
-    color: Colors.text,
   },
   buttonText: {
     fontSize: 12,
     fontWeight: "600",
+  },
+  selectedText: {
+    color: Colors.background,
+  },
+  unselectedText: {
+    color: Colors.text,
   },
 });
