@@ -1,1 +1,1 @@
-export const BACKEND_URL = "http://192.168.1.2:8001";
+export const BACKEND_URL = "https://chillaware-1.onrender.com";

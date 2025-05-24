@@ -51,3 +51,56 @@
 2025-05-24 11:20:50,313 - INFO -  - apple: confidence=0.838, bbox=[26, 24, 169, 187], category=Fruits
 2025-05-24 11:20:50,313 - INFO - Skipping apple due to cooldown
 2025-05-24 11:20:50,313 - INFO - Processing completed: Detected 1 items, added 0 to inventory
+2025-05-24 12:03:41,800 - INFO - Processing uploaded file: photo_1748068422270.jpg
+2025-05-24 12:03:41,823 - INFO - Received image size: 7992 bytes
+2025-05-24 12:03:42,291 - INFO - Image decoded successfully: (225, 224, 3)
+2025-05-24 12:03:42,293 - INFO - Processing image: 224x225
+2025-05-24 12:03:46,643 - INFO - All detections found: 6
+2025-05-24 12:03:46,708 - INFO - Food-related detections: 6
+2025-05-24 12:03:46,767 - INFO - Added food detection: apple (0.838)
+2025-05-24 12:03:47,921 - INFO - Final food detections: 1
+2025-05-24 12:03:47,922 - INFO - Detection results: 1 items found
+2025-05-24 12:03:47,923 - INFO -  - apple: confidence=0.838, bbox=[26, 24, 169, 187], category=Fruits
+2025-05-24 12:03:47,928 - INFO - Added to inventory: 1x apple (confidence: 0.838)
+2025-05-24 12:03:47,930 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 12:03:48,197 - INFO - Skipping apple due to cooldown
+2025-05-24 12:08:21,563 - INFO - Processing uploaded file: photo_1748068702035.jpg
+2025-05-24 12:08:21,568 - INFO - Received image size: 8554 bytes
+2025-05-24 12:08:21,601 - INFO - Image decoded successfully: (219, 229, 3)
+2025-05-24 12:08:21,602 - INFO - Processing image: 229x219
+2025-05-24 12:08:23,811 - INFO - All detections found: 6
+2025-05-24 12:08:23,812 - INFO - Food-related detections: 6
+2025-05-24 12:08:23,822 - INFO - Added food detection: orange (0.939)
+2025-05-24 12:08:23,825 - INFO - Final food detections: 1
+2025-05-24 12:08:23,827 - INFO - Detection results: 1 items found
+2025-05-24 12:08:23,828 - INFO -  - orange: confidence=0.939, bbox=[29, 19, 180, 190], category=Fruits
+2025-05-24 12:08:23,830 - INFO - Added to inventory: 1x orange (confidence: 0.939)
+2025-05-24 12:08:23,832 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 12:08:23,903 - INFO - Skipping orange due to cooldown
+2025-05-24 12:08:33,193 - INFO - Inventory cleared
+2025-05-24 12:08:55,348 - INFO - Processing uploaded file: photo_1748068735901.jpg
+2025-05-24 12:08:55,349 - INFO - Received image size: 8554 bytes
+2025-05-24 12:08:55,350 - INFO - Image decoded successfully: (219, 229, 3)
+2025-05-24 12:08:55,350 - INFO - Processing image: 229x219
+2025-05-24 12:08:55,875 - INFO - All detections found: 6
+2025-05-24 12:08:55,876 - INFO - Food-related detections: 6
+2025-05-24 12:08:55,876 - INFO - Added food detection: orange (0.939)
+2025-05-24 12:08:55,876 - INFO - Final food detections: 1
+2025-05-24 12:08:55,877 - INFO - Detection results: 1 items found
+2025-05-24 12:08:55,877 - INFO -  - orange: confidence=0.939, bbox=[29, 19, 180, 190], category=Fruits
+2025-05-24 12:08:55,877 - INFO - Added to inventory: 1x orange (confidence: 0.939)
+2025-05-24 12:08:55,878 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 12:08:55,895 - INFO - Skipping orange due to cooldown
+2025-05-24 12:09:00,594 - INFO - Processing uploaded file: photo_1748068741147.jpg
+2025-05-24 12:09:00,594 - INFO - Received image size: 7992 bytes
+2025-05-24 12:09:00,595 - INFO - Image decoded successfully: (225, 224, 3)
+2025-05-24 12:09:00,595 - INFO - Processing image: 224x225
+2025-05-24 12:09:01,187 - INFO - All detections found: 6
+2025-05-24 12:09:01,187 - INFO - Food-related detections: 6
+2025-05-24 12:09:01,188 - INFO - Added food detection: apple (0.838)
+2025-05-24 12:09:01,188 - INFO - Final food detections: 1
+2025-05-24 12:09:01,188 - INFO - Detection results: 1 items found
+2025-05-24 12:09:01,188 - INFO -  - apple: confidence=0.838, bbox=[26, 24, 169, 187], category=Fruits
+2025-05-24 12:09:01,189 - INFO - Added to inventory: 1x apple (confidence: 0.838)
+2025-05-24 12:09:01,189 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 12:09:01,229 - INFO - Skipping apple due to cooldown
