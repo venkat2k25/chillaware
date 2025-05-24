@@ -1,0 +1,53 @@
+2025-05-24 11:01:55,795 - INFO - YOLO model loaded successfully
+2025-05-24 11:01:55,795 - INFO - Available classes: 80
+2025-05-24 11:01:56,640 - INFO - YOLO model loaded successfully
+2025-05-24 11:01:56,640 - INFO - Available classes: 80
+2025-05-24 11:01:56,652 - INFO - Starting Fridge Scanner API...
+2025-05-24 11:01:56,652 - INFO - Detection method: YOLO
+2025-05-24 11:01:56,652 - INFO - Confidence threshold: 0.3
+2025-05-24 11:01:56,653 - INFO - Food categories available: 62
+2025-05-24 11:01:57,041 - INFO - Processing uploaded file: photo_1748064707664.jpg
+2025-05-24 11:01:57,041 - INFO - Received image size: 7992 bytes
+2025-05-24 11:01:57,059 - INFO - Image decoded successfully: (225, 224, 3)
+2025-05-24 11:01:57,063 - INFO - Processing image: 224x225
+2025-05-24 11:02:02,397 - INFO - All detections found: 6
+2025-05-24 11:02:02,520 - INFO - Food-related detections: 6
+2025-05-24 11:02:02,562 - INFO - Added food detection: apple (0.838)
+2025-05-24 11:02:02,563 - INFO - Final food detections: 1
+2025-05-24 11:02:02,564 - INFO - Detection results: 1 items found
+2025-05-24 11:02:02,564 - INFO -  - apple: confidence=0.838, bbox=[26, 24, 169, 187], category=Fruits
+2025-05-24 11:02:02,609 - INFO - Added to inventory: 1x apple (confidence: 0.838)
+2025-05-24 11:02:02,611 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 11:18:15,093 - INFO - Shutting down Fridge Scanner API...
+2025-05-24 11:20:42,128 - INFO - YOLO model loaded successfully
+2025-05-24 11:20:42,177 - INFO - Available classes: 80
+2025-05-24 11:20:43,937 - INFO - YOLO model loaded successfully
+2025-05-24 11:20:43,937 - INFO - Available classes: 80
+2025-05-24 11:20:43,949 - INFO - Starting Fridge Scanner API...
+2025-05-24 11:20:43,950 - INFO - Detection method: YOLO
+2025-05-24 11:20:43,950 - INFO - Confidence threshold: 0.3
+2025-05-24 11:20:43,950 - INFO - Food categories available: 62
+2025-05-24 11:20:44,311 - INFO - Processing uploaded file: photo_1748065703630.jpg
+2025-05-24 11:20:44,311 - INFO - Received image size: 7992 bytes
+2025-05-24 11:20:44,334 - INFO - Image decoded successfully: (225, 224, 3)
+2025-05-24 11:20:44,334 - INFO - Processing image: 224x225
+2025-05-24 11:20:47,969 - INFO - All detections found: 6
+2025-05-24 11:20:47,983 - INFO - Food-related detections: 6
+2025-05-24 11:20:48,426 - INFO - Added food detection: apple (0.838)
+2025-05-24 11:20:48,428 - INFO - Final food detections: 1
+2025-05-24 11:20:48,431 - INFO - Detection results: 1 items found
+2025-05-24 11:20:48,432 - INFO -  - apple: confidence=0.838, bbox=[26, 24, 169, 187], category=Fruits
+2025-05-24 11:20:48,435 - INFO - Added to inventory: 1x apple (confidence: 0.838)
+2025-05-24 11:20:48,437 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 11:20:48,486 - INFO - Processing uploaded file: photo_1748065829799.jpg
+2025-05-24 11:20:48,486 - INFO - Received image size: 7992 bytes
+2025-05-24 11:20:48,490 - INFO - Image decoded successfully: (225, 224, 3)
+2025-05-24 11:20:48,491 - INFO - Processing image: 224x225
+2025-05-24 11:20:49,973 - INFO - All detections found: 6
+2025-05-24 11:20:49,973 - INFO - Food-related detections: 6
+2025-05-24 11:20:50,309 - INFO - Added food detection: apple (0.838)
+2025-05-24 11:20:50,311 - INFO - Final food detections: 1
+2025-05-24 11:20:50,312 - INFO - Detection results: 1 items found
+2025-05-24 11:20:50,313 - INFO -  - apple: confidence=0.838, bbox=[26, 24, 169, 187], category=Fruits
+2025-05-24 11:20:50,313 - INFO - Skipping apple due to cooldown
+2025-05-24 11:20:50,313 - INFO - Processing completed: Detected 1 items, added 0 to inventory

@@ -26,8 +26,10 @@
     "expo-linear-gradient": "^14.1.4",
     "expo-status-bar": "~2.2.3",
     "expo-text-recognition": "^0.1.1",
+    "expo-updates": "^0.28.13",
     "express": "^5.1.0",
     "install": "^0.13.0",
+    "lucide-react": "^0.511.0",
     "react": "19.0.0",
     "react-native": "0.79.2",
     "react-native-blob-util": "^0.21.2",
@@ -41,6 +43,7 @@
     "react-native-tesseract-ocr": "^2.0.3",
     "react-native-vision-camera": "^4.6.4",
     "react-native-voice": "^0.3.0",
+    "react-native-worklets-core": "^1.5.0",
     "tesseract.js": "^6.0.1"
   },
   "devDependencies": {

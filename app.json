@@ -12,18 +12,47 @@
       "resizeMode": "contain",
       "backgroundColor": "#A8E6A3"
     },
+    "plugins": [
+      [
+        "react-native-vision-camera",
+        {
+          "cameraPermissionText": "ChillAware needs access to your camera to scan food items",
+          "enableMicrophonePermission": false,
+          "enableCodeScanner": false
+        }
+      ]
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "ChillAware needs access to your camera to scan food items"
+      },
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icons/Logo.png",
         "backgroundColor": "#A8E6A3"
       },
-      "package": "com.karthi_2002.ChillAware"
+      "package": "com.karthi_2002.ChillAware",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.CAMERA"
+      ],
+      "runtimeVersion": "1.0.0"
     },
     "web": {
       "favicon": "./assets/icons/Logo.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "094368b1-41dc-4446-8224-999216c9729c"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/094368b1-41dc-4446-8224-999216c9729c"
     }
   }
 }
