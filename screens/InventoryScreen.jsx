@@ -14,6 +14,7 @@ import {
   Modal,
   Image,
 } from "react-native";
+import placeholderImage from '../assets/empty.jpg'
 import Svg, { Path, Line } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Audio } from "expo-av";
@@ -22,20 +23,7 @@ import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 
-// Placeholder image for inventory items
-const placeholderImage = "https://picsum.photos/200";
 
-const BlobBackground = () => (
-  <Svg width="200" height="200" viewBox="0 0 200 200">
-    <Path
-      fill="#030B3880"
-      d="M47.6,-62.9C60.3,-55.2,67.6,-38.3,69.6,-22.6C71.5,-6.9,68,7.6,61.3,20.3C54.6,33,44.7,43.9,32.9,52.3C21.1,60.6,7.5,66.4,-7.7,70.1C-22.9,73.7,-39.6,75.1,-52.8,66.6C-66,58.1,-75.7,39.7,-78.5,21.2C-81.3,2.6,-77.2,-15.9,-68.2,-31.1C-59.2,-46.4,-45.4,-58.4,-30.1,-65.9C-14.8,-73.5,2,-76.5,18.2,-74.4C34.5,-72.3,49.3,-65.7,47.6,-62.9Z"
-      transform="translate(100 100)"
-    />
-  </Svg>
-);
-
-const { width: screenWidth } = Dimensions.get("window");
 
 // Voice Wave Visualization Component
 const VoiceWave = ({ isRecording, audioLevels }) => {
@@ -90,7 +78,7 @@ const VoiceWave = ({ isRecording, audioLevels }) => {
                 inputRange: [0, 1],
                 outputRange: [6, 35],
               }),
-              backgroundColor: isRecording ? "#00ff88" : "#4CAF50",
+              backgroundColor: isRecording ? Colors.bg: Colors.background,
               opacity: isRecording ? 1 : 0.5,
             },
           ]}
@@ -170,11 +158,10 @@ const RecordingCard = ({
     >
       <View style={styles.recordingHeader}>
         <View style={styles.recordingInfo}>
-          <Text style={styles.recordingTitle}>🎙️ Recording</Text>
           <Text style={styles.recordingSubtitle}>{itemName}</Text>
         </View>
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-          <Ionicons name="close" size={20} color={Colors.text} />
+          <Ionicons name="close" size={24} color={Colors.background} />
         </TouchableOpacity>
       </View>
 
@@ -186,7 +173,7 @@ const RecordingCard = ({
         <View style={styles.statusContainer}>
           {recordingState === "processing" ? (
             <View style={styles.processingContainer}>
-              <ActivityIndicator size="small" color={Colors.primary} />
+              <ActivityIndicator size="small" color={Colors.background} />
               <Text style={styles.statusText}>Processing...</Text>
             </View>
           ) : isRecording ? (
@@ -223,27 +210,97 @@ const RecordingCard = ({
   );
 };
 
+
+const foodItem =[
+  {
+    "name": "eggs",
+    "link": "https://images.pexels.com/photos/4045561/pexels-photo-4045561.jpeg?auto=compress&cs=tinysrgb&h=650&w=940"
+  },
+  {
+    "name": "milk",
+    "link": "https://images.pexels.com/photos/2198626/pexels-photo-2198626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+  },
+  {
+    "name": "bread",
+    "link": "https://assets.bonappetit.com/photos/5c62e4a3e81bbf522a9579ce/1:1/w_1920,c_limit/milk-bread.jpg"
+  },
+  {
+    "name": "double cream",
+    "link": "https://www.spar.co.uk/media/lttcmxsg/5bbc048c-7bfb-4acf-a0e1-7f5243bc2ab1.jpg?anchor=center&mode=crop&heightratio=1&width=720&format=webp&quality=80&rnd=133051920326000000"
+  },
+  {
+    "name": "sweetcorn",
+    "link": "https://images.pexels.com/photos/547263/pexels-photo-547263.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2"
+  },
+  {
+    "name": "green pesto",
+    "link": "https://theviewfromgreatisland.com/wp-content/uploads/2022/08/basil-pesto-Genovese-3132-August-28-2022-2.jpg"
+  },
+  {
+    "name": "moroccan salmon",
+    "link": "https://www.feastingathome.com/wp-content/uploads/2016/02/moroccan-salmon-106-1.jpg"
+  },
+  {
+    "name": "carrot",
+    "link": "https://t4.ftcdn.net/jpg/02/28/90/67/360_F_228906712_r4bb71gSmKvyDHq54JvjXAhKWpQiqWvX.jpg"
+  },
+  {
+    "name": "avocado",
+    "link": "https://nutritionsource.hsph.harvard.edu/wp-content/uploads/2022/04/pexels-antonio-filigno-8538296-1024x657.jpg"
+  },
+  {
+    "name": "tomato",
+    "link": "https://t4.ftcdn.net/jpg/03/27/96/23/360_F_327962332_6mb5jQLnTOjhYeXML7v45Hc5eED2GYOD.jpg"
+  },
+  {
+    "name": "yoghurt",
+    "link": "https://images.getrecipekit.com/20240109191538-homemade-yogurt.jpg?width=650&quality=90&"
+  },
+  {
+    "name": "cucumber",
+    "link": "https://th.bing.com/th/id/OIP.VKG1qNp4bQnOTWVzO1DJiwHaEo?cb=iwp2&rs=1&pid=ImgDetMain"
+  }
+]
+
 // ProductCard Component
 const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
-  const formattedDate = item.purchaseDate.split("-").reverse().join("-");
+  const date = new Date(item.purchaseDate);
+  const formattedDate = date.toLocaleDateString('default', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+
+  const match = foodItem.find((food) =>
+    item.productName.toLowerCase().includes(food.name.toLowerCase())
+  );
 
   return (
     <View style={styles.productCard}>
       <Image
-        source={{ uri: placeholderImage }}
+         source={match ? { uri: match.link } : placeholderImage}
         style={styles.productImage}
-        resizeMode="contain"
+        resizeMode="cover"
       />
+      <View style={{ flex: 1, justifyContent: 'space-between' }}>
       <Text style={styles.productName} numberOfLines={2}>
         {item.productName} ({item.quantity})
       </Text>
       {item.weight !== "N/A" && (
-        <Text style={styles.productDetail}>Weight: {item.weight}</Text>
+        <Text style={styles.productDetail}>📟 {item.weight}</Text>
       )}
-      <Text style={styles.productDetail}>Purchased: {formattedDate}</Text>
-      {item.expiryDate !== "N/A" && (
-        <Text style={styles.productDetail}>Expiry: {item.expiryDate}</Text>
-      )}
+      <Text style={styles.productDetail}>🛒 {formattedDate}</Text>
+      {item.expiryDate !== "N/A" && (() => {
+      const date = new Date(item.expiryDate);
+      const formattedDate = date.toLocaleDateString('default', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      });
+      return <Text style={styles.productDetail}>⏰ {formattedDate}</Text>;
+    })()}
+
+
       <View style={styles.actionButtons}>
         <TouchableOpacity
           style={[
@@ -269,6 +326,7 @@ const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
         >
           <Ionicons name="trash-outline" size={12} color={Colors.text} />
         </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -289,12 +347,35 @@ export default function InventoryScreen() {
   const [currentRecordingItem, setCurrentRecordingItem] = useState(null);
   const [audioLevels, setAudioLevels] = useState(Array(20).fill(0.1));
   const audioLevelInterval = useRef(null);
-  const numColumns = 2;
+  const numColumns = 1;
 
   // State for category filters
   const [expandedCategories, setExpandedCategories] = useState({});
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [categories, setCategories] = useState({});
+
+
+  const category =[
+  "🥦 Vegetarian",
+  "🍗 Non-Vegetarian",
+  "🥛 Dairy Products",
+  "🧃 Drinks & Beverages",
+  "🍿 Snacks",
+  "🌿 Greens & Herbs",
+  "🧂 Condiments & Essentials",
+  "🌾 Grains & Staples",
+  "🥐 Bakery & Breakfast Items"
+]
+
+ const [selected, setSelected] = useState([]);
+
+  const toggleCategory = (category) => {
+    setSelected((prev) =>
+      prev.includes(category)
+        ? prev.filter((item) => item !== category)
+        : [...prev, category]
+    );
+  };
 
   useEffect(() => {
     loadInventoryData();
@@ -816,12 +897,12 @@ export default function InventoryScreen() {
   };
 
   // Toggle parent category expansion
-  const toggleCategory = (parentCategory) => {
-    setExpandedCategories((prev) => ({
-      ...prev,
-      [parentCategory]: !prev[parentCategory],
-    }));
-  };
+  // const toggleCategory = (parentCategory) => {
+  //   setExpandedCategories((prev) => ({
+  //     ...prev,
+  //     [parentCategory]: !prev[parentCategory],
+  //   }));
+  // };
 
   // Handle subcategory selection
   const selectSubCategory = (subCategory) => {
@@ -866,7 +947,7 @@ export default function InventoryScreen() {
           />
           <Ionicons
             name="search"
-            size={24}
+            size={22}
             style={styles.searchIcon}
             color={Colors.primary}
           />
@@ -876,9 +957,24 @@ export default function InventoryScreen() {
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
-          style={styles.categoryScroll}
+          style={[styles.categoryScroll, { marginRight: -15 }]}
         >
-          {Object.keys(categories).map((parentCategory) => (
+         {category.map((cat, index) => (
+        <TouchableOpacity
+          key={index}
+          onPress={() => toggleCategory(cat)}
+          style={[
+            styles.button,
+            selected.includes(cat) ? styles.selected : styles.unselected
+          ]}
+        >
+          <Text style={[
+                styles.buttonText,
+                 selected.includes(cat) ? styles.selected : styles.unselected,
+              ]}>{cat}</Text>
+        </TouchableOpacity>
+      ))}
+          {/* {Object.keys(categories).map((parentCategory) => (
             <View key={parentCategory} style={styles.categoryContainer}>
               <TouchableOpacity
                 style={styles.parentCategoryButton}
@@ -921,7 +1017,7 @@ export default function InventoryScreen() {
                 </View>
               )}
             </View>
-          ))}
+          ))} */}
         </ScrollView>
 
         {inventoryData.length === 0 ? (
@@ -936,7 +1032,6 @@ export default function InventoryScreen() {
             contentContainerStyle={styles.listContent}
             showsVerticalScrollIndicator={false}
             numColumns={numColumns}
-            columnWrapperStyle={styles.columnWrapper}
             key={`flatlist-${numColumns}`}
           />
         )}
@@ -967,7 +1062,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   searchContainer: {
-    paddingBottom: 25,
+    paddingBottom: 15,
     flexDirection: "row",
     gap: 10,
     justifyContent: "center",
@@ -1038,16 +1133,13 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 100,
   },
-  columnWrapper: {
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
   productCard: {
     backgroundColor: Colors.card,
-    borderRadius: 10,
+    borderRadius: 15,
     padding: 10,
-    margin: 5,
-    width: (screenWidth - 40) / 2,
+    marginBottom: 18,
+    flexDirection: 'row',
+    gap: 15,
     shadowColor: Colors.secondary,
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.15,
@@ -1058,26 +1150,28 @@ const styles = StyleSheet.create({
   productImage: {
     width: 100,
     height: 100,
-    marginBottom: 10,
+    borderRadius: 15,
   },
   productName: {
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: "600",
     color: Colors.text,
-    textAlign: "center",
-    marginBottom: 5,
+    textAlign: "left",
+    marginBottom: 8,
   },
   productDetail: {
     fontSize: 12,
     color: Colors.text,
     marginBottom: 5,
-    textAlign: "center",
+    fontWeight: '500',
+    textAlign: "left",
   },
   actionButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 10,
-    marginTop: 5,
+    flexDirection: 'row',
+    justifyContent: "flex-end", 
+  gap: 10,
+  marginTop: 10,
+  alignSelf: "flex-end", 
   },
   micIconContainer: {
     backgroundColor: Colors.text,
@@ -1110,10 +1204,10 @@ const styles = StyleSheet.create({
   },
   recordingCard: {
     position: "absolute",
-    bottom: 20,
+    bottom: 30,
     left: 20,
     right: 20,
-    backgroundColor: Colors.card,
+    backgroundColor: Colors.text,
     borderRadius: 15,
     padding: 15,
     shadowColor: Colors.secondary,
@@ -1131,15 +1225,10 @@ const styles = StyleSheet.create({
   recordingInfo: {
     flex: 1,
   },
-  recordingTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: Colors.text,
-  },
   recordingSubtitle: {
-    fontSize: 14,
-    color: Colors.text,
-    opacity: 0.7,
+    fontSize: 16,
+    color: Colors.background,
+    fontWeight: '600',
   },
   closeButton: {
     padding: 5,
@@ -1174,33 +1263,51 @@ const styles = StyleSheet.create({
   },
   statusText: {
     fontSize: 14,
-    color: Colors.text,
+    color: Colors.background,
   },
   recordActionButton: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#4CAF50",
+    backgroundColor: Colors.secondary,
     paddingVertical: 8,
     paddingHorizontal: 15,
     borderRadius: 20,
     gap: 5,
   },
   stopButton: {
-    backgroundColor: "#ff4444",
+    backgroundColor: Colors.error,
   },
   disabledButton: {
     backgroundColor: "#cccccc",
   },
   recordActionText: {
-    color: "white",
+    color: Colors.background,
     fontSize: 14,
     fontWeight: "600",
   },
   recordingHint: {
     fontSize: 12,
-    color: Colors.text,
+    color: Colors.background,
     opacity: 0.6,
     textAlign: "center",
     marginTop: 5,
+  },
+   button: {
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderRadius: 25,
+    margin: 5,
+  },
+  selected: {
+    backgroundColor: Colors.text,
+    color: Colors.background,
+  },
+  unselected: {
+    backgroundColor: Colors.bg,
+    color: Colors.text,
+  },
+  buttonText: {
+    fontSize: 12,
+    fontWeight: "600",
   },
 });

@@ -9,7 +9,7 @@ const Colors = {
     LightGray: '#CCCCCC',
     blue: '#1D7FD6',
     orange:'#FFC669',
-    card: '#A8E6A340'
+    card: '#A8E6A350'
   };
   
 export default Colors;

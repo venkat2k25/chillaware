@@ -1,79 +1,159 @@
-import React from "react";
-import { ScrollView, View, Text, StyleSheet } from "react-native";
+import React, { useEffect, useState } from "react";
+import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomHeader from "../layouts/CustomHeader";
 import MessageCard from "../components/MessageCard";
 import Colors from "../utils/Colors";
 
-const Messages = [
-  {
-    id: 1,
-    text: "Your broccoli called. It’s wilting in despair. 🥦",
-    time: "2 mins ago"
-  },
-  {
-    id: 2,
-    text: "You’ve got 24 hours before the tomatoes rebel 🍅⏰.",
-    time: "10 mins ago"
-  },
-  {
-    id: 3,
-    text: "Still edible, still incredible! Use it before you lose it 👏",
-    time: "30 mins ago"
-  },
-  {
-    id: 4,
-    text: "Don’t ghost your spinach. It deserves a second chance 💚",
-    time: "1 hour ago"
-  },
-  {
-    id: 5,
-    text: "Turn that sad carrot into a happy soup 🥕✨",
-    time: "2 hours ago"
-  },
-  {
-    id: 6,
-    text: "Hey snack 😘… rescue the real ones before they expire 💅",
-    time: "3 hours ago"
-  },
-  {
-    id: 7,
-    text: "Don’t romanticize red flags — or red meats past their prime. 🥩🚩",
-    time: "5 hours ago"
-  },
-  {
-    id: 8,
-    text: "Aww… your apples are getting old. Give them a sweet goodbye in a pie 🥧🍎",
-    time: "Yesterday"
-  },
-  {
-    id: 9,
-    text: "Someone’s rotting… and it’s not your vibe 💅🍌",
-    time: "Yesterday"
-  },
-  {
-    id: 10,
-    text: "Still fresh, still fabulous. Just like you 🫶💚",
-    time: "2 days ago"
-  },
-  {
-    id: 11,
-    text: "Psst… the berries are blushing. They want to be picked 🫐💕",
-    time: "2 days ago"
-  }
+const SENTENCES = [
+  "⏳ Hurry up! Only 24 hours left before the {title product} vanishes into the void.",
+  "⏰ Tick-tock... The {title product} deal disappears tomorrow! 🕛",
+  "⚡ The clock’s running out — grab your {title product} before it’s history! 📦",
+  "🚨 Final countdown: The {title product} exits in just one day! 🔥",
+  "👋 Say goodbye to {title product} — it's almost gone for good!",
+  "⛔ Last chance! Your {title product} rebels at midnight! 🌙",
+  "⌛ Time’s almost up — don’t let the {title product} escape your grasp! 🏃‍♂️",
+  "⚠️ Warning: {title product} is in its final hours. Don’t miss it! 🕒",
+  "🫣 The end is near — {title product} won’t stick around much longer.",
+  "👀 Blink and you’ll miss it — {title product} expires in 24 hours! 🚀",
 ];
 
-
-
 export default function NotificationScreen() {
+  const [inventory, setInventory] = useState([]);
+  const [messages, setMessages] = useState([]);
+
+  const getTimeAgo = (timestamp) => {
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInSeconds = Math.floor((now - time) / 1000);
+
+    const days = Math.floor(diffInSeconds / (60 * 60 * 24));
+    const hours = Math.floor((diffInSeconds % (60 * 60 * 24)) / (60 * 60));
+    const minutes = Math.floor((diffInSeconds % (60 * 60)) / 60);
+
+    if (days > 5) return "a long time ago";
+    if (days > 1) return `${days} days ago`;
+    if (days === 1) return "1 day ago";
+    if (hours >= 1) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
+    if (minutes >= 1) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
+    return "Just now";
+  };
+
+  useEffect(() => {
+    const loadInventory = async () => {
+      try {
+        const data = await AsyncStorage.getItem("inventory");
+        if (data) {
+          const parsedData = JSON.parse(data);
+          const formattedData = parsedData.map((item, index) => ({
+            id: index.toString(),
+            productName: item.item || "Unknown Item",
+            expiryDate: item.expiry_date || "N/A",
+            originalIndex: index,
+          }));
+          setInventory(formattedData);
+        }
+      } catch (error) {
+        console.error("Failed to load inventory:", error);
+      }
+    };
+
+    const loadStoredMessages = async () => {
+      try {
+        const data = await AsyncStorage.getItem("messages");
+        if (data) {
+          setMessages(JSON.parse(data));
+        }
+      } catch (error) {
+        console.error("Failed to load messages:", error);
+      }
+    };
+
+    loadInventory();
+    loadStoredMessages();
+  }, []);
+
+  useEffect(() => {
+    if (inventory.length === 0) return;
+
+    const checkExpiry = async () => {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const tomorrowStr = tomorrow.toISOString().split("T")[0];
+
+      const newMessages = [];
+
+      for (const item of inventory) {
+        if (item.expiryDate === tomorrowStr) {
+          const randomSentence =
+            SENTENCES[Math.floor(Math.random() * SENTENCES.length)];
+          const messageText = randomSentence.replace(
+            "{title product}",
+            item.productName
+          );
+
+          const newMessage = {
+            id: Date.now() + Math.random(),
+            text: messageText,
+            time: new Date().toISOString(),
+          };
+
+          newMessages.push(newMessage);
+        }
+      }
+
+      if (newMessages.length > 0) {
+        const updatedMessages = [...newMessages, ...messages];
+        setMessages(updatedMessages);
+
+        try {
+          await AsyncStorage.setItem(
+            "messages",
+            JSON.stringify(updatedMessages)
+          );
+        } catch (err) {
+          console.error("Failed to store messages:", err);
+        }
+      }
+    };
+
+    const interval = setInterval(checkExpiry, 10000); 
+
+    return () => clearInterval(interval);
+  }, [inventory, messages]);
+
+  const handleClearMessages = async () => {
+    setMessages([]);
+    try {
+      await AsyncStorage.removeItem("messages");
+    } catch (err) {
+      console.error("Failed to clear messages:", err);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <CustomHeader title={"Notifications"} />
-
-      <ScrollView style={styles.content} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false} >
-        {Messages.map((item) => (
-          <MessageCard key={item.id} message={item} />
+      <View style={styles.topBar}>
+        <Text style={styles.heading}>Messages</Text>
+        {messages.length > 0 && (
+          <TouchableOpacity onPress={handleClearMessages}>
+            <Text style={styles.clearText}>Clear All</Text>
+          </TouchableOpacity>
+        )}
+      </View>
+      <ScrollView
+        style={styles.content}
+        contentContainerStyle={{ paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {messages.map((item) => (
+          <MessageCard
+            key={item.id}
+            message={{ ...item, time: getTimeAgo(item.time) }}
+          />
         ))}
-        </ScrollView>
+      </ScrollView>
     </View>
   );
 }
@@ -83,8 +163,27 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
+  topBar: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 15,
+    paddingTop: 75,
+    paddingBottom: 10,
+  },
+  heading: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: Colors.primary,
+  },
+  clearText: {
+    fontSize: 12,
+    textDecorationLine: "underline",
+    paddingBottom: 3,
+    color: Colors.text,
+    fontWeight: "bold",
+  },
   content: {
-    paddingTop: 80,
     paddingHorizontal: 15,
   },
 });

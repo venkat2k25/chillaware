@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
 import axios from "axios";
+import Loading from "../layouts/Loading";
 
 const BACKEND_URL = "https://chillaware-backend.onrender.com";
 
@@ -221,8 +222,7 @@ export default function ScanScreen() {
       >
         {loadingInventory ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.text} />
-            <Text style={styles.loadingText}>Processing inventory...</Text>
+            <Loading />
           </View>
         ) : (
           <View style={styles.instructionsContainer}>
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
   loadingContainer: {
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    paddingTop: '40%',
   },
   loadingText: {
     textAlign: "center",

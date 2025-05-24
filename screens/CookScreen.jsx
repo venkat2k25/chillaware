@@ -11,11 +11,13 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
+import FoodImage from '../assets/food.png'
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Svg, { Path } from "react-native-svg";
+import Loading from "../layouts/Loading";
 
 const { width } = Dimensions.get("window");
 
@@ -261,9 +263,10 @@ export default function CookScreen() {
           <View style={styles.recipeCard}>
             <View style={styles.recipeImageContainer}>
               <Image
-                source={{ uri: item.imageUrl }}
+                source={FoodImage}
                 style={styles.recipeImage}
                 resizeMode="cover"
+                defaultSource={FoodImage}
               />
               <View
                 style={[
@@ -331,9 +334,10 @@ export default function CookScreen() {
 
         <View style={styles.recipeDetailHeader}>
           <Image
-            source={{ uri: selectedRecipe.imageUrl }}
+            source={FoodImage}
             style={styles.recipeDetailImage}
             resizeMode="cover"
+            defaultSource={FoodImage}
           />
 
           <View style={styles.recipeDetailOverlay}>
@@ -376,13 +380,13 @@ export default function CookScreen() {
         <View style={styles.recipeDetailContent}>
           <View style={styles.recipeDetailSection}>
             <Text style={styles.recipeDetailSectionTitle}>
-              <Ionicons name="list-outline" size={20} color={Colors.bg} />{" "}
+              <Ionicons name="list-outline" size={20} color={Colors.text} />{" "}
               Ingredients
             </Text>
             {selectedRecipe.ingredients.map((ingredient, index) => (
               <View key={index} style={styles.ingredientItem}>
                 <View
-                  style={[styles.ingredientDot, { backgroundColor: Colors.bg }]}
+                  style={[styles.ingredientDot, { backgroundColor: Colors.text }]}
                 />
                 <Text style={styles.ingredientText}>{ingredient}</Text>
               </View>
@@ -391,7 +395,7 @@ export default function CookScreen() {
 
           <View style={styles.recipeDetailSection}>
             <Text style={styles.recipeDetailSectionTitle}>
-              <Ionicons name="restaurant-outline" size={20} color={Colors.bg} />{" "}
+              <Ionicons name="restaurant-outline" size={20} color={Colors.text} />{" "}
               Preparation Steps
             </Text>
             {selectedRecipe.steps.map((step, index) => (
@@ -406,7 +410,7 @@ export default function CookScreen() {
 
           <View style={styles.recipeDetailSection}>
             <Text style={styles.recipeDetailSectionTitle}>
-              <Ionicons name="bulb-outline" size={20} color={Colors.bg} />{" "}
+              <Ionicons name="bulb-outline" size={20} color={Colors.text} />{" "}
               Cooking Tips
             </Text>
             <Text style={styles.tipText}>
@@ -436,10 +440,7 @@ export default function CookScreen() {
       >
         {loading ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" color={Colors.primary} />
-            <Text style={styles.loadingText}>
-              Generating delicious recipes...
-            </Text>
+            <Loading />
           </View>
         ) : error ? (
           <View style={styles.errorContainer}>
@@ -605,7 +606,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 40,
+    paddingTop: '40%',
   },
   loadingText: {
     fontSize: 18,
@@ -642,7 +643,7 @@ const styles = StyleSheet.create({
   },
   recipeCard: {
     backgroundColor: Colors.card,
-    borderRadius: 16,
+    borderRadius: 15,
     overflow: "hidden",
     marginBottom: 20,
     shadowColor: Colors.secondary,
@@ -693,12 +694,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   recipeInfo: {
-    padding: 16,
+    padding: 10,
   },
   recipeName: {
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.bg,
+    color: Colors.text,
     marginBottom: 10,
   },
   recipeMetaContainer: {
@@ -718,8 +719,8 @@ const styles = StyleSheet.create({
   },
   selectRecipeButton: {
     paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: Colors.bg + "70",
+    borderRadius: 50,
+    backgroundColor: Colors.text + "70",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -748,7 +749,7 @@ const styles = StyleSheet.create({
     padding: 15,
   },
   recipeDetailName: {
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "600",
     color: Colors.primary,
     marginBottom: 5,
@@ -782,7 +783,7 @@ const styles = StyleSheet.create({
   recipeDetailSectionTitle: {
     fontSize: 20,
     fontWeight: "600",
-    color: Colors.bg,
+    color: Colors.text,
     marginBottom: 16,
   },
   ingredientItem: {
@@ -808,7 +809,7 @@ const styles = StyleSheet.create({
     width: 25,
     height: 25,
     borderRadius: 14,
-    backgroundColor: Colors.bg,
+    backgroundColor: Colors.text,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 12,
