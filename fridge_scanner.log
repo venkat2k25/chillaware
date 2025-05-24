@@ -104,3 +104,125 @@
 2025-05-24 12:09:01,189 - INFO - Added to inventory: 1x apple (confidence: 0.838)
 2025-05-24 12:09:01,189 - INFO - Processing completed: Detected 1 items, added 1 to inventory
 2025-05-24 12:09:01,229 - INFO - Skipping apple due to cooldown
+2025-05-24 15:23:16,457 - ERROR - Model file not found: yolov3.weights in E:\chillaware
+2025-05-24 15:23:16,506 - ERROR - Model file not found: yolov3.cfg in E:\chillaware
+2025-05-24 15:23:16,507 - ERROR - Model file not found: coco.names in E:\chillaware
+2025-05-24 15:23:16,507 - WARNING - YOLO model files not found. Falling back to color-based detection
+2025-05-24 15:23:16,508 - INFO - Using fallback color-based detection method
+2025-05-24 15:23:16,508 - INFO - Fallback detection for: ['apple', 'banana', 'orange', 'carrot', 'broccoli', 'bottle', 'tomato', 'lemon', 'milk', 'cheese']
+2025-05-24 15:23:17,758 - ERROR - Model file not found: yolov3.weights in E:\chillaware
+2025-05-24 15:23:17,766 - ERROR - Model file not found: yolov3.cfg in E:\chillaware
+2025-05-24 15:23:17,766 - ERROR - Model file not found: coco.names in E:\chillaware
+2025-05-24 15:23:17,766 - WARNING - YOLO model files not found. Falling back to color-based detection
+2025-05-24 15:23:17,766 - INFO - Using fallback color-based detection method
+2025-05-24 15:23:17,768 - INFO - Fallback detection for: ['apple', 'banana', 'orange', 'carrot', 'broccoli', 'bottle', 'tomato', 'lemon', 'milk', 'cheese']
+2025-05-24 15:23:18,033 - ERROR - Model file not found: yolov3.weights in E:\chillaware
+2025-05-24 15:23:18,034 - ERROR - Model file not found: yolov3.cfg in E:\chillaware
+2025-05-24 15:23:18,035 - ERROR - Model file not found: coco.names in E:\chillaware
+2025-05-24 15:23:18,035 - WARNING - YOLO model files not found. Falling back to color-based detection
+2025-05-24 15:23:18,035 - INFO - Using fallback color-based detection method
+2025-05-24 15:23:18,035 - INFO - Fallback detection for: ['apple', 'banana', 'orange', 'carrot', 'broccoli', 'bottle', 'tomato', 'lemon', 'milk', 'cheese']
+2025-05-24 15:23:18,046 - INFO - Starting Fridge Scanner API...
+2025-05-24 15:23:18,046 - INFO - Detection method: Fallback
+2025-05-24 15:23:18,047 - INFO - Confidence threshold: 0.3
+2025-05-24 15:23:18,047 - INFO - Food categories available: 62
+2025-05-24 15:38:13,576 - ERROR - Model file not found: yolov3.weights in E:\chillaware
+2025-05-24 15:38:13,616 - ERROR - Model file not found: yolov3.cfg in E:\chillaware
+2025-05-24 15:38:13,618 - ERROR - Model file not found: coco.names in E:\chillaware
+2025-05-24 15:38:13,618 - WARNING - YOLO model files not found. Falling back to color-based detection
+2025-05-24 15:38:13,619 - INFO - Using fallback color-based detection method
+2025-05-24 15:38:13,619 - INFO - Fallback detection for: ['apple', 'banana', 'orange', 'carrot', 'broccoli', 'bottle', 'tomato', 'lemon', 'milk', 'cheese']
+2025-05-24 15:38:14,568 - ERROR - Model file not found: yolov3.weights in E:\chillaware
+2025-05-24 15:38:14,569 - ERROR - Model file not found: yolov3.cfg in E:\chillaware
+2025-05-24 15:38:14,569 - ERROR - Model file not found: coco.names in E:\chillaware
+2025-05-24 15:38:14,569 - WARNING - YOLO model files not found. Falling back to color-based detection
+2025-05-24 15:38:14,570 - INFO - Using fallback color-based detection method
+2025-05-24 15:38:14,571 - INFO - Fallback detection for: ['apple', 'banana', 'orange', 'carrot', 'broccoli', 'bottle', 'tomato', 'lemon', 'milk', 'cheese']
+2025-05-24 15:38:14,710 - ERROR - Model file not found: yolov3.weights in E:\chillaware
+2025-05-24 15:38:14,710 - ERROR - Model file not found: yolov3.cfg in E:\chillaware
+2025-05-24 15:38:14,711 - ERROR - Model file not found: coco.names in E:\chillaware
+2025-05-24 15:38:14,711 - WARNING - YOLO model files not found. Falling back to color-based detection
+2025-05-24 15:38:14,711 - INFO - Using fallback color-based detection method
+2025-05-24 15:38:14,711 - INFO - Fallback detection for: ['apple', 'banana', 'orange', 'carrot', 'broccoli', 'bottle', 'tomato', 'lemon', 'milk', 'cheese']
+2025-05-24 15:38:14,719 - INFO - Starting Fridge Scanner API...
+2025-05-24 15:38:14,719 - INFO - Detection method: Fallback
+2025-05-24 15:38:14,720 - INFO - Confidence threshold: 0.3
+2025-05-24 15:38:14,720 - INFO - Food categories available: 62
+2025-05-24 15:54:25,519 - INFO - Shutting down Fridge Scanner API...
+2025-05-24 15:54:33,015 - INFO - YOLO model loaded successfully
+2025-05-24 15:54:33,015 - INFO - Available classes: 80
+2025-05-24 15:54:34,121 - INFO - YOLO model loaded successfully
+2025-05-24 15:54:34,123 - INFO - Available classes: 80
+2025-05-24 15:54:34,554 - INFO - YOLO model loaded successfully
+2025-05-24 15:54:34,554 - INFO - Available classes: 80
+2025-05-24 15:54:34,559 - INFO - Starting Fridge Scanner API...
+2025-05-24 15:54:34,559 - INFO - Detection method: YOLO
+2025-05-24 15:54:34,559 - INFO - Confidence threshold: 0.3
+2025-05-24 15:54:34,564 - INFO - Food categories available: 62
+2025-05-24 15:56:20,640 - INFO - Processing uploaded file: photo_1748082380344.jpg
+2025-05-24 15:56:20,645 - INFO - Received image size: 3886399 bytes
+2025-05-24 15:56:20,791 - INFO - Image decoded successfully: (4032, 3024, 3)
+2025-05-24 15:56:20,819 - INFO - Resized image to 768x1024
+2025-05-24 15:56:20,819 - INFO - Processing image: 768x1024
+2025-05-24 15:56:25,691 - INFO - All detections found: 2
+2025-05-24 15:56:25,693 - INFO - Food-related detections: 2
+2025-05-24 15:56:26,441 - INFO - Added food detection: apple (0.810)
+2025-05-24 15:56:26,441 - INFO - Final food detections: 1
+2025-05-24 15:56:26,441 - INFO - Detection results: 1 items found
+2025-05-24 15:56:26,473 - INFO -  - apple: confidence=0.810, bbox=[180, 381, 387, 453], category=Fruits
+2025-05-24 15:56:26,523 - INFO - Added to inventory: 1x apple (confidence: 0.810)
+2025-05-24 15:56:26,617 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 15:56:27,410 - INFO - Skipping apple due to cooldown
+2025-05-24 16:29:05,632 - INFO - Processing uploaded file: photo_1748084345463.jpg
+2025-05-24 16:29:05,935 - INFO - Received image size: 2655696 bytes
+2025-05-24 16:29:06,061 - INFO - Image decoded successfully: (4032, 3024, 3)
+2025-05-24 16:29:06,099 - INFO - Resized image to 768x1024
+2025-05-24 16:29:06,099 - INFO - Processing image: 768x1024
+2025-05-24 16:29:12,474 - INFO - All detections found: 0
+2025-05-24 16:29:12,486 - INFO - Food-related detections: 0
+2025-05-24 16:29:12,489 - INFO - Final food detections: 0
+2025-05-24 16:29:12,489 - INFO - Detection results: 0 items found
+2025-05-24 16:29:12,502 - INFO - Processing completed: Detected 0 items, added 0 to inventory
+2025-05-24 16:29:25,531 - INFO - Processing uploaded file: photo_1748084365535.jpg
+2025-05-24 16:29:25,531 - INFO - Received image size: 1248361 bytes
+2025-05-24 16:29:25,640 - INFO - Image decoded successfully: (4032, 3024, 3)
+2025-05-24 16:29:25,645 - INFO - Resized image to 768x1024
+2025-05-24 16:29:25,645 - INFO - Processing image: 768x1024
+2025-05-24 16:29:28,291 - INFO - All detections found: 1
+2025-05-24 16:29:28,305 - INFO - Food-related detections: 1
+2025-05-24 16:29:28,315 - INFO - Added food detection: orange (0.543)
+2025-05-24 16:29:28,322 - INFO - Final food detections: 1
+2025-05-24 16:29:28,340 - INFO - Detection results: 1 items found
+2025-05-24 16:29:28,357 - INFO -  - orange: confidence=0.543, bbox=[65, 324, 614, 555], category=Fruits
+2025-05-24 16:29:28,363 - INFO - Added to inventory: 1x orange (confidence: 0.543)
+2025-05-24 16:29:28,368 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 16:29:28,584 - INFO - Skipping orange due to cooldown
+2025-05-24 16:37:35,332 - INFO - Processing uploaded file: photo_1748084855338.jpg
+2025-05-24 16:37:35,332 - INFO - Received image size: 704343 bytes
+2025-05-24 16:37:35,409 - INFO - Image decoded successfully: (4032, 3024, 3)
+2025-05-24 16:37:35,419 - INFO - Resized image to 768x1024
+2025-05-24 16:37:35,419 - INFO - Processing image: 768x1024
+2025-05-24 16:37:42,377 - INFO - All detections found: 6
+2025-05-24 16:37:42,377 - INFO - Food-related detections: 6
+2025-05-24 16:37:42,391 - INFO - Added food detection: orange (0.961)
+2025-05-24 16:37:42,393 - INFO - Final food detections: 1
+2025-05-24 16:37:42,395 - INFO - Detection results: 1 items found
+2025-05-24 16:37:42,397 - INFO -  - orange: confidence=0.961, bbox=[176, 319, 507, 510], category=Fruits
+2025-05-24 16:37:42,397 - INFO - Added to inventory: 1x orange (confidence: 0.961)
+2025-05-24 16:37:42,404 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 16:37:42,557 - INFO - Skipping orange due to cooldown
+2025-05-24 17:04:20,542 - INFO - Processing uploaded file: photo_1748086460537.jpg
+2025-05-24 17:04:20,589 - INFO - Received image size: 1642336 bytes
+2025-05-24 17:04:20,724 - INFO - Image decoded successfully: (4032, 3024, 3)
+2025-05-24 17:04:20,739 - INFO - Resized image to 768x1024
+2025-05-24 17:04:20,739 - INFO - Processing image: 768x1024
+2025-05-24 17:04:26,675 - INFO - All detections found: 8
+2025-05-24 17:04:26,718 - INFO - Food-related detections: 8
+2025-05-24 17:04:26,734 - INFO - Added food detection: broccoli (0.962)
+2025-05-24 17:04:26,734 - INFO - Final food detections: 1
+2025-05-24 17:04:26,734 - INFO - Detection results: 1 items found
+2025-05-24 17:04:26,734 - INFO -  - broccoli: confidence=0.962, bbox=[42, 297, 592, 386], category=Vegetables
+2025-05-24 17:04:26,734 - INFO - Added to inventory: 1x broccoli (confidence: 0.962)
+2025-05-24 17:04:26,742 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-24 17:04:27,295 - INFO - Skipping broccoli due to cooldown
+2025-05-24 17:05:40,848 - INFO - Shutting down Fridge Scanner API...
