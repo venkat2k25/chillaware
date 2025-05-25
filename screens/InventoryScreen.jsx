@@ -330,60 +330,72 @@ const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
 
 // Subcategory JSON
 const subcategories = {
-  "🥦 Vegetarian": {
+  "🍎 Fruits": {
+    "Citrus": ["Orange", "Lemon", "Lime", "Grapefruit"],
+    "Berries": ["Strawberry", "Blueberry", "Raspberry", "Blackberry"],
+    "Tropical": ["Mango", "Pineapple", "Banana", "Papaya"],
+    "Stone Fruits": ["Peach", "Plum", "Cherry", "Apricot"],
+    "Apples & Pears": ["Apple", "Pear", "Green Apple", "Red Apple"]
+  },
+
+  "🥦 Vegetables": {
     "Leafy Vegetables": ["Spinach", "Lettuce", "Kale", "Cabbage"],
     "Root Vegetables": ["Carrot", "Potato", "Beetroot", "Radish"],
-    "Cruciferous Vegetables": ["Broccoli", "Cauliflower", "Brussels Sprouts"],
-    "Other Vegetables": ["Cucumber", "Onion", "Tomato", "Bell Pepper", "Zucchini", "Aubergine"],
+    "Cruciferous": ["Broccoli", "Cauliflower", "Brussels Sprouts"],
+    "Other Vegetables": ["Cucumber", "Onion", "Tomato", "Bell Pepper", "Zucchini", "Eggplant"]
   },
-  "🍗 Non-Vegetarian": {
-    "Poultry": ["Chicken Breast", "Chicken Thigh", "Turkey"],
-    "Red Meat": ["Beef", "Lamb", "Pork"],
-    "Seafood": ["Salmon", "Tuna", "Shrimp", "Crab"],
-    "Eggs": ["Chicken Eggs", "Quail Eggs", "Eggs"],
-  },
-  "🥛 Dairy Products": {
-    "Milk": ["Whole Milk", "Skim Milk", "Almond Milk", "Soy Milk", "Oat Milk"],
-    "Cheese": ["Cheddar", "Mozzarella", "Parmesan", "Cream Cheese"],
-    "Yogurt": ["Plain Yogurt", "Greek Yogurt", "Flavored Yogurt", "Yoghurt"],
-    "Butter & Cream": ["Salted Butter", "Unsalted Butter", "Heavy Cream", "Double Cream"],
-  },
-  "🧃 Drinks & Beverages": {
-    "Soft Drinks": ["Cola", "Lemonade", "Ginger Ale"],
-    "Juices": ["Orange Juice", "Apple Juice", "Mango Juice"],
-    "Tea & Coffee": ["Green Tea", "Black Coffee", "Herbal Tea"],
-    "Alcoholic Beverages": ["Beer", "Wine", "Whiskey"],
-    "Water": ["Still Water", "Sparkling Water"],
-  },
-  "🍿 Snacks": {
-    "Chips & Crisps": ["Potato Chips", "Tortilla Chips", "Pita Chips"],
-    "Nuts & Seeds": ["Almonds", "Cashews", "Sunflower Seeds", "Nuts"],
-    "Popcorn": ["Butter Popcorn", "Caramel Popcorn"],
-    "Candy & Sweets": ["Chocolate Bars", "Gummies", "Hard Candy", "Caramel", "Strawberry Laces", "Oreo"],
-  },
-  "🌿 Greens & Herbs": {
-    "Fresh Herbs": ["Basil", "Cilantro", "Parsley", "Mint"],
-    "Salad Greens": ["Arugula", "Romaine", "Mixed Greens", "Spinach"],
-    "Microgreens": ["Pea Shoots", "Radish Sprouts", "Sunflower Sprouts"],
-  },
-  "🧂 Condiments & Essentials": {
+
+  "🧂 Condiments": {
     "Sauces": ["Ketchup", "Mustard", "Soy Sauce", "Hot Sauce", "Pesto", "Houmous"],
     "Spices": ["Black Pepper", "Cumin", "Paprika", "Turmeric"],
     "Oils": ["Olive Oil", "Vegetable Oil", "Coconut Oil"],
-    "Vinegars": ["Balsamic Vinegar", "Apple Cider Vinegar", "White Vinegar"],
+    "Vinegars": ["Balsamic Vinegar", "Apple Cider Vinegar", "White Vinegar"]
   },
-  "🌾 Grains & Staples": {
-    "Rice": ["White Rice", "Brown Rice", "Basmati Rice", "Quinoa"],
-    "Pasta": ["Spaghetti", "Penne", "Fusilli", "Noodles"],
-    "Flours": ["All-Purpose Flour", "Whole Wheat Flour", "Almond Flour"],
-    "Legumes": ["Lentils", "Chickpeas", "Black Beans", "Mixed Pulses", "Green Pea"],
-  },
-  "🥐 Bakery & Breakfast Items": {
-    "Bread": ["White Bread", "Sourdough", "Whole Grain Bread", "Rye Bread", "Brioche", "Multigrain Thins"],
+
+  "🥐 Bread and Pastries": {
+    "Bread": ["White Bread", "Sourdough", "Whole Grain Bread", "Rye Bread", "Brioche"],
     "Pastries": ["Croissant", "Danish", "Muffin"],
-    "Cereals": ["Oatmeal", "Corn Flakes", "Granola"],
-    "Breakfast Spreads": ["Peanut Butter", "Jam", "Honey", "Maple"],
+    "Breakfast Cereals": ["Oatmeal", "Corn Flakes", "Granola"],
+    "Spreads": ["Peanut Butter", "Jam", "Honey", "Maple Syrup"]
   },
+
+  "🐟 Fish": {
+    "Fresh Fish": ["Salmon", "Tuna", "Cod", "Tilapia"],
+    "Shellfish": ["Shrimp", "Crab", "Lobster", "Mussels"],
+    "Canned Fish": ["Canned Tuna", "Sardines", "Anchovies"]
+  },
+
+  "🥩 Meat": {
+    "Red Meat": ["Beef", "Lamb", "Pork"],
+    "Processed Meat": ["Bacon", "Sausage", "Ham"],
+    "Organ Meat": ["Liver", "Kidney", "Heart"]
+  },
+
+  "🍗 Poultry": {
+    "Chicken": ["Chicken Breast", "Chicken Thigh", "Chicken Wings"],
+    "Turkey": ["Turkey Breast", "Ground Turkey"],
+    "Duck & Others": ["Duck Breast", "Quail"]
+  },
+
+  "🧀 Dairy": {
+    "Milk": ["Whole Milk", "Skim Milk", "Almond Milk", "Soy Milk", "Oat Milk"],
+    "Cheese": ["Cheddar", "Mozzarella", "Parmesan", "Cream Cheese"],
+    "Yogurt": ["Plain Yogurt", "Greek Yogurt", "Flavored Yogurt"],
+    "Butter & Cream": ["Salted Butter", "Unsalted Butter", "Heavy Cream", "Double Cream"]
+  },
+
+  "🥚 Eggs": {
+    "Chicken Eggs": ["White Eggs", "Brown Eggs"],
+    "Duck Eggs": ["Whole Duck Eggs"],
+    "Quail Eggs": ["Spotted Quail Eggs"]
+  },
+
+  "🍱 Ready-to-Eat": {
+    "Snacks": ["Potato Chips", "Tortilla Chips", "Popcorn", "Nuts", "Chocolate Bars"],
+    "Beverages": ["Cola", "Juice", "Green Tea", "Coffee", "Water"],
+    "Packaged Meals": ["Instant Noodles", "Microwave Meals", "Sandwiches"],
+    "Bakery Snacks": ["Cake Slices", "Cupcakes", "Cookies"]
+  }
 };
 
 const GEMINI_API_KEY = "AIzaSyD57P0SmXEGmRorqT9qh2ngZ8Cgnbt-wAk";
@@ -407,16 +419,19 @@ export default function InventoryScreen() {
   const [selected, setSelected] = useState([]);
 
   const category = [
-    "🥦 Vegetarian",
-    "🍗 Non-Vegetarian",
-    "🥛 Dairy Products",
-    "🧃 Drinks & Beverages",
-    "🍿 Snacks",
-    "🌿 Greens & Herbs",
-    "🧂 Condiments & Essentials",
-    "🌾 Grains & Staples",
-    "🥐 Bakery & Breakfast Items",
-  ];
+  "🍎 Fruits",
+  "🥦 Vegetables",
+  "🧂 Condiments",
+  "🥐 Bread and Pastries",
+  "🐟 Fish",
+  "🥩 Meat",
+  "🍗 Poultry",
+  "🧀 Dairy",
+  "🥚 Eggs",
+  "🍱 Ready-to-Eat"
+]
+
+
 
   useEffect(() => {
     loadInventoryData();
@@ -441,47 +456,6 @@ export default function InventoryScreen() {
     }
   };
 
-  const assignCategoryAndSubcategory = (itemName) => {
-    let parentCategory = "Unknown Category";
-    let subCategory = "Unknown Subcategory";
-
-    // Normalize itemName for matching
-    const normalizedItem = itemName.toLowerCase().replace(/[^a-z0-9\s]/g, '');
-
-    // Search through subcategories
-    for (const [parent, subCats] of Object.entries(subcategories)) {
-      for (const [subCat, items] of Object.entries(subCats)) {
-        if (
-          items.some((subItem) =>
-            normalizedItem.includes(subItem.toLowerCase().replace(/[^a-z0-9\s]/g, ''))
-          ) ||
-          normalizedItem.includes(subCat.toLowerCase().replace(/[^a-z0-9\s]/g, ''))
-        ) {
-          parentCategory = parent;
-          subCategory = subCat;
-          return { parentCategory, subCategory };
-        }
-      }
-    }
-
-    // Fallback mappings for specific items
-    if (normalizedItem.includes("strawbs") || normalizedItem.includes("strawberry")) {
-      parentCategory = "🥦 Vegetarian";
-      subCategory = "Other Vegetables";
-    } else if (normalizedItem.includes("tofu")) {
-      parentCategory = "🥦 Vegetarian";
-      subCategory = "Other Vegetables";
-    } else if (normalizedItem.includes("apple")) {
-      parentCategory = "🥦 Vegetarian";
-      subCategory = "Other Vegetables";
-    } else if (normalizedItem.includes("banana")) {
-      parentCategory = "🥦 Vegetarian";
-      subCategory = "Other Vegetables";
-    }
-
-    return { parentCategory, subCategory };
-  };
-
   const loadInventoryData = async () => {
     try {
       const data = await AsyncStorage.getItem("inventory");
@@ -489,7 +463,6 @@ export default function InventoryScreen() {
         const parsedData = JSON.parse(data);
         console.log("Loaded inventory:", parsedData);
         const formattedData = parsedData.map((item, index) => {
-          const { parentCategory, subCategory } = assignCategoryAndSubcategory(item.item);
           return {
             id: index.toString(),
             productName: item.item || "Unknown Item",
@@ -497,8 +470,6 @@ export default function InventoryScreen() {
             purchaseDate: item.purchase_date || "Unknown Date",
             weight: item.weight || "N/A",
             expiryDate: item.expiry_date || "N/A",
-            parentCategory: item.parentCategory || parentCategory,
-            subCategory: item.subCategory || subCategory,
             originalIndex: index,
           };
         });
@@ -512,8 +483,6 @@ export default function InventoryScreen() {
           purchase_date: item.purchaseDate,
           weight: item.weight,
           expiry_date: item.expiryDate,
-          parentCategory: item.parentCategory,
-          subCategory: item.subCategory,
         }));
         await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
       }
