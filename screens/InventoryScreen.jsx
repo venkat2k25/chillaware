@@ -998,7 +998,7 @@ export default function InventoryScreen() {
 
     // Check if the item's parentCategory is in the selected categories
     const matchesCategory = selected.includes(item.parentCategory);
-
+    console.log(`Item: ${item.productName}, Matches Search: ${matchesSearch}, Matches Category: ${matchesCategory}`);
     return matchesSearch && matchesCategory;
   });
 
@@ -1164,11 +1164,6 @@ const styles = StyleSheet.create({
     marginBottom: 18,
     flexDirection: 'row',
     gap: 15,
-    shadowColor: Colors.secondary,
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    elevation: 5,
     alignItems: "center",
   },
   productImage: {

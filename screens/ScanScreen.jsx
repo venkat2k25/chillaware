@@ -318,11 +318,6 @@ const styles = StyleSheet.create({
   instructionsContainer: {
     padding: 20,
     marginVertical: 15,
-    borderRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 5,
   },
   instructionTitle: {
     fontSize: 22,

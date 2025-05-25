@@ -136,8 +136,8 @@ const subcategories = {
 // API Configuration
 const BACKEND_URL =
   Platform.OS === "ios"
-    ? "http://192.168.0.215:8001"
-    : "http://192.168.0.215:8001";
+    ? "https://fridge-backend-e2qc.onrender.com"
+    : "https://fridge-backend-e2qc.onrender.com";
 
 // Logger utility
 const logger = {
