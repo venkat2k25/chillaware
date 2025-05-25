@@ -226,3 +226,41 @@
 2025-05-24 17:04:26,742 - INFO - Processing completed: Detected 1 items, added 1 to inventory
 2025-05-24 17:04:27,295 - INFO - Skipping broccoli due to cooldown
 2025-05-24 17:05:40,848 - INFO - Shutting down Fridge Scanner API...
+2025-05-25 19:18:37,639 - INFO - YOLO model loaded successfully
+2025-05-25 19:18:37,705 - INFO - Available classes: 80
+2025-05-25 19:18:44,425 - INFO - YOLO model loaded successfully
+2025-05-25 19:18:44,425 - INFO - Available classes: 80
+2025-05-25 19:18:45,477 - INFO - YOLO model loaded successfully
+2025-05-25 19:18:45,479 - INFO - Available classes: 80
+2025-05-25 19:18:45,502 - INFO - Starting Fridge Scanner API...
+2025-05-25 19:18:45,502 - INFO - Detection method: YOLO
+2025-05-25 19:18:45,503 - INFO - Confidence threshold: 0.3
+2025-05-25 19:18:45,504 - INFO - Food categories available: 62
+2025-05-25 19:25:36,464 - INFO - Processing uploaded file: photo_1748181336824.jpg
+2025-05-25 19:25:36,508 - INFO - Received image size: 1315702 bytes
+2025-05-25 19:25:36,610 - INFO - Image decoded successfully: (4032, 3024, 3)
+2025-05-25 19:25:36,640 - INFO - Resized image to 768x1024
+2025-05-25 19:25:36,641 - INFO - Processing image: 768x1024
+2025-05-25 19:25:43,783 - INFO - All detections found: 4
+2025-05-25 19:25:44,053 - INFO - Food-related detections: 4
+2025-05-25 19:25:44,150 - INFO - Added food detection: broccoli (0.953)
+2025-05-25 19:25:44,150 - INFO - Final food detections: 1
+2025-05-25 19:25:44,154 - INFO - Detection results: 1 items found
+2025-05-25 19:25:44,156 - INFO -  - broccoli: confidence=0.953, bbox=[200, 312, 448, 546], category=Vegetables
+2025-05-25 19:25:44,169 - INFO - Added to inventory: 1x broccoli (confidence: 0.953)
+2025-05-25 19:25:44,171 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-25 19:25:44,481 - INFO - Skipping broccoli due to cooldown
+2025-05-25 19:25:53,499 - INFO - Processing uploaded file: photo_1748181353763.jpg
+2025-05-25 19:25:53,670 - INFO - Received image size: 1364262 bytes
+2025-05-25 19:25:55,394 - INFO - Image decoded successfully: (4032, 3024, 3)
+2025-05-25 19:25:55,453 - INFO - Resized image to 768x1024
+2025-05-25 19:25:55,454 - INFO - Processing image: 768x1024
+2025-05-25 19:26:02,106 - INFO - All detections found: 2
+2025-05-25 19:26:02,110 - INFO - Food-related detections: 2
+2025-05-25 19:26:02,122 - INFO - Added food detection: broccoli (0.905)
+2025-05-25 19:26:02,122 - INFO - Final food detections: 1
+2025-05-25 19:26:02,128 - INFO - Detection results: 1 items found
+2025-05-25 19:26:02,130 - INFO -  - broccoli: confidence=0.905, bbox=[153, 364, 467, 442], category=Vegetables
+2025-05-25 19:26:02,134 - INFO - Added to inventory: 1x broccoli (confidence: 0.905)
+2025-05-25 19:26:02,136 - INFO - Processing completed: Detected 1 items, added 1 to inventory
+2025-05-25 19:26:02,446 - INFO - Skipping broccoli due to cooldown
