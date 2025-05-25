@@ -1,11 +1,28 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from "@react-navigation/native";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import LogoImg from "../assets/icons/Logo.png";
 import Colors from "../utils/Colors";
+import { useEffect, useState } from "react";
 const Header = () => {
   const navigation = useNavigation();
-  
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const storedData = await AsyncStorage.getItem("messages");
+        const parsedData = storedData ? JSON.parse(storedData) : [];
+        setNotifications(parsedData);
+      } catch (e) {
+        console.log("Failed to load notifications", e);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
@@ -13,9 +30,19 @@ const Header = () => {
         <Text style={styles.logoText}>ChillAware</Text>
       </View>
       <View>
-        <TouchableOpacity style={styles.icon} onPress={() => navigation.navigate('Notification')}>
+        <TouchableOpacity
+          style={styles.icon}
+          onPress={() => navigation.navigate("Notification")}
+        >
           <Ionicons name="notifications" size={22} color={Colors.background} />
         </TouchableOpacity>
+         {notifications.length > 0 && (
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>
+                {notifications.length > 99 ? "99+" : notifications.length}
+              </Text>
+            </View>
+          )}
       </View>
     </View>
   );
@@ -48,12 +75,12 @@ const styles = StyleSheet.create({
   logo: {
     width: 80,
     height: 40,
-    objectFit: 'contain'
+    objectFit: "contain",
   },
   logoText: {
     color: Colors.text,
     fontSize: 22,
-    fontFamily: 'Syne-SemiBold'
+    fontFamily: "Syne-SemiBold",
   },
   icon: {
     width: 35,
@@ -62,7 +89,26 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.text,
     alignItems: "center",
     justifyContent: "center",
-    overflow: 'hidden',
+    overflow: "hidden",
+  },
+  badge: {
+    position: "absolute",
+    top: -8,
+    right: -10,
+    backgroundColor: Colors.background,
+    borderRadius: 10,
+    padding: 5,
+    minWidth: 20,
+    height: 20,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 10,
+  },
+
+  badgeText: {
+    color: Colors.text,
+    fontSize: 10,
+    fontWeight: "700",
   },
 });
 
