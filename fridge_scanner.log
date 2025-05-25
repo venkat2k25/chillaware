@@ -264,3 +264,5 @@
 2025-05-25 19:26:02,134 - INFO - Added to inventory: 1x broccoli (confidence: 0.905)
 2025-05-25 19:26:02,136 - INFO - Processing completed: Detected 1 items, added 1 to inventory
 2025-05-25 19:26:02,446 - INFO - Skipping broccoli due to cooldown
+2025-05-25 19:39:52,213 - INFO - Removed 1x broccoli from inventory
+2025-05-25 19:39:52,574 - INFO - Removed 1x broccoli from inventory
