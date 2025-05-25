@@ -22,8 +22,9 @@ import * as FileSystem from "expo-file-system";
 import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { foodItem } from "../json/foodItems";
 
-// VoiceWave Component
+// VoiceWave Component (unchanged)
 const VoiceWave = ({ isRecording, audioLevels }) => {
   const animatedValues = useRef(
     Array.from({ length: 15 }, () => new Animated.Value(0.2))
@@ -86,7 +87,7 @@ const VoiceWave = ({ isRecording, audioLevels }) => {
   );
 };
 
-// RecordingCard Component
+// RecordingCard Component (unchanged)
 const RecordingCard = ({
   visible,
   onClose,
@@ -208,59 +209,7 @@ const RecordingCard = ({
   );
 };
 
-// FoodItem Array
-const foodItem = [
-  {
-    name: "eggs",
-    link: "https://images.pexels.com/photos/4045561/pexels-photo-4045561.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
-  },
-  {
-    name: "milk",
-    link: "https://images.pexels.com/photos/2198626/pexels-photo-2198626.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  },
-  {
-    name: "bread",
-    link: "https://assets.bonappetit.com/photos/5c62e4a3e81bbf522a9579ce/1:1/w_1920,c_limit/milk-bread.jpg",
-  },
-  {
-    name: "double cream",
-    link: "https://www.spar.co.uk/media/lttcmxsg/5bbc048c-7bfb-4acf-a0e1-7f5243bc2ab1.jpg?anchor=center&mode=crop&heightratio=1&width=720&format=webp&quality=80&rnd=133051920326000000",
-  },
-  {
-    name: "sweetcorn",
-    link: "https://images.pexels.com/photos/547263/pexels-photo-547263.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2",
-  },
-  {
-    name: "green pesto",
-    link: "https://theviewfromgreatisland.com/wp-content/uploads/2022/08/basil-pesto-Genovese-3132-August-28-2022-2.jpg",
-  },
-  {
-    name: "moroccan salmon",
-    link: "https://www.feastingathome.com/wp-content/uploads/2016/02/moroccan-salmon-106-1.jpg",
-  },
-  {
-    name: "carrot",
-    link: "https://t4.ftcdn.net/jpg/02/28/90/67/360_F_228906712_r4bb71gSmKvyDHq54JvjXAhKWpQiqWvX.jpg",
-  },
-  {
-    name: "avocado",
-    link: "https://nutritionsource.hsph.harvard.edu/wp-content/uploads/2022/04/pexels-antonio-filigno-8538296-1024x657.jpg",
-  },
-  {
-    name: "tomato",
-    link: "https://t4.ftcdn.net/jpg/03/27/96/23/360_F_327962332_6mb5jQLnTOjhYeXML7v45Hc5eED2GYOD.jpg",
-  },
-  {
-    name: "yoghurt",
-    link: "https://images.getrecipekit.com/20240109191538-homemade-yogurt.jpg?width=650&quality=90&",
-  },
-  {
-    name: "cucumber",
-    link: "https://th.bing.com/th/id/OIP.VKG1qNp4bQnOTWVzO1DJiwHaEo?cb=iwp2&rs=1&pid=ImgDetMain",
-  },
-];
-
-// ProductCard Component
+// ProductCard Component (modified to show category and subcategory)
 const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
   const date = new Date(item.purchaseDate);
   const formattedDate = date.toLocaleDateString('default', {
@@ -284,6 +233,11 @@ const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
         <Text style={styles.productName} numberOfLines={2}>
           {item.productName} ({item.quantity})
         </Text>
+        {/* {item.parentCategory && (
+          <Text style={styles.productDetail}>
+            📂 {item.parentCategory} {item.subCategory ? `> ${item.subCategory}` : ''}
+          </Text>
+        )} */}
         {item.weight !== "N/A" && (
           <Text style={styles.productDetail}>📟 {item.weight}</Text>
         )}
@@ -328,7 +282,7 @@ const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
   );
 };
 
-// Subcategory JSON
+// Subcategory JSON (unchanged)
 const subcategories = {
   "🍎 Fruits": {
     "Citrus": ["Orange", "Lemon", "Lime", "Grapefruit"],
@@ -337,59 +291,50 @@ const subcategories = {
     "Stone Fruits": ["Peach", "Plum", "Cherry", "Apricot"],
     "Apples & Pears": ["Apple", "Pear", "Green Apple", "Red Apple"]
   },
-
   "🥦 Vegetables": {
     "Leafy Vegetables": ["Spinach", "Lettuce", "Kale", "Cabbage"],
     "Root Vegetables": ["Carrot", "Potato", "Beetroot", "Radish"],
     "Cruciferous": ["Broccoli", "Cauliflower", "Brussels Sprouts"],
     "Other Vegetables": ["Cucumber", "Onion", "Tomato", "Bell Pepper", "Zucchini", "Eggplant"]
   },
-
   "🧂 Condiments": {
     "Sauces": ["Ketchup", "Mustard", "Soy Sauce", "Hot Sauce", "Pesto", "Houmous"],
     "Spices": ["Black Pepper", "Cumin", "Paprika", "Turmeric"],
     "Oils": ["Olive Oil", "Vegetable Oil", "Coconut Oil"],
     "Vinegars": ["Balsamic Vinegar", "Apple Cider Vinegar", "White Vinegar"]
   },
-
   "🥐 Bread and Pastries": {
     "Bread": ["White Bread", "Sourdough", "Whole Grain Bread", "Rye Bread", "Brioche"],
     "Pastries": ["Croissant", "Danish", "Muffin"],
     "Breakfast Cereals": ["Oatmeal", "Corn Flakes", "Granola"],
     "Spreads": ["Peanut Butter", "Jam", "Honey", "Maple Syrup"]
   },
-
   "🐟 Fish": {
     "Fresh Fish": ["Salmon", "Tuna", "Cod", "Tilapia"],
     "Shellfish": ["Shrimp", "Crab", "Lobster", "Mussels"],
     "Canned Fish": ["Canned Tuna", "Sardines", "Anchovies"]
   },
-
   "🥩 Meat": {
     "Red Meat": ["Beef", "Lamb", "Pork"],
     "Processed Meat": ["Bacon", "Sausage", "Ham"],
     "Organ Meat": ["Liver", "Kidney", "Heart"]
   },
-
   "🍗 Poultry": {
     "Chicken": ["Chicken Breast", "Chicken Thigh", "Chicken Wings"],
     "Turkey": ["Turkey Breast", "Ground Turkey"],
     "Duck & Others": ["Duck Breast", "Quail"]
   },
-
   "🧀 Dairy": {
     "Milk": ["Whole Milk", "Skim Milk", "Almond Milk", "Soy Milk", "Oat Milk"],
     "Cheese": ["Cheddar", "Mozzarella", "Parmesan", "Cream Cheese"],
     "Yogurt": ["Plain Yogurt", "Greek Yogurt", "Flavored Yogurt"],
     "Butter & Cream": ["Salted Butter", "Unsalted Butter", "Heavy Cream", "Double Cream"]
   },
-
   "🥚 Eggs": {
     "Chicken Eggs": ["White Eggs", "Brown Eggs"],
     "Duck Eggs": ["Whole Duck Eggs"],
     "Quail Eggs": ["Spotted Quail Eggs"]
   },
-
   "🍱 Ready-to-Eat": {
     "Snacks": ["Potato Chips", "Tortilla Chips", "Popcorn", "Nuts", "Chocolate Bars"],
     "Beverages": ["Cola", "Juice", "Green Tea", "Coffee", "Water"],
@@ -419,19 +364,44 @@ export default function InventoryScreen() {
   const [selected, setSelected] = useState([]);
 
   const category = [
-  "🍎 Fruits",
-  "🥦 Vegetables",
-  "🧂 Condiments",
-  "🥐 Bread and Pastries",
-  "🐟 Fish",
-  "🥩 Meat",
-  "🍗 Poultry",
-  "🧀 Dairy",
-  "🥚 Eggs",
-  "🍱 Ready-to-Eat"
-]
+    "🍎 Fruits",
+    "🥦 Vegetables",
+    "🧂 Condiments",
+    "🥐 Bread and Pastries",
+    "🐟 Fish",
+    "🥩 Meat",
+    "🍗 Poultry",
+    "🧀 Dairy",
+    "🥚 Eggs",
+    "🍱 Ready-to-Eat"
+  ];
 
-
+  // Function to assign category and subcategory using regex
+  const assignCategoryAndSubcategory = (productName) => {
+    const lowerProductName = productName.toLowerCase();
+    
+    for (const [parentCategory, subCats] of Object.entries(subcategories)) {
+      for (const [subCategory, items] of Object.entries(subCats)) {
+        // Create a regex pattern for each item in the subcategory
+        for (const item of items) {
+          const regex = new RegExp(`\\b${item.toLowerCase()}\\b`, 'i');
+          if (regex.test(lowerProductName)) {
+            return { parentCategory, subCategory };
+          }
+        }
+      }
+    }
+    
+    // Fallback for items not found in subcategories
+    for (const [parentCategory, subCats] of Object.entries(subcategories)) {
+      // Check if product name partially matches category name
+      if (lowerProductName.includes(parentCategory.replace(/[^a-zA-Z ]/g, '').toLowerCase())) {
+        return { parentCategory, subCategory: 'Other' };
+      }
+    }
+    
+    return { parentCategory: 'Other', subCategory: 'Uncategorized' };
+  };
 
   useEffect(() => {
     loadInventoryData();
@@ -463,6 +433,7 @@ export default function InventoryScreen() {
         const parsedData = JSON.parse(data);
         console.log("Loaded inventory:", parsedData);
         const formattedData = parsedData.map((item, index) => {
+          const { parentCategory, subCategory } = assignCategoryAndSubcategory(item.item || "Unknown Item");
           return {
             id: index.toString(),
             productName: item.item || "Unknown Item",
@@ -471,6 +442,8 @@ export default function InventoryScreen() {
             weight: item.weight || "N/A",
             expiryDate: item.expiry_date || "N/A",
             originalIndex: index,
+            parentCategory,
+            subCategory,
           };
         });
 
@@ -483,6 +456,8 @@ export default function InventoryScreen() {
           purchase_date: item.purchaseDate,
           weight: item.weight,
           expiry_date: item.expiryDate,
+          parentCategory: item.parentCategory,
+          subCategory: item.subCategory,
         }));
         await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
       }
@@ -953,7 +928,6 @@ export default function InventoryScreen() {
     );
   };
 
-
   // Filter inventory data based on search query and selected categories
   const filteredData = inventoryData.filter((item) => {
     const matchesSearch = item.productName
@@ -967,7 +941,6 @@ export default function InventoryScreen() {
 
     // Check if the item's parentCategory is in the selected categories
     const matchesCategory = selected.includes(item.parentCategory);
-    console.log(`Item: ${item.productName}, Matches Search: ${matchesSearch}, Matches Category: ${matchesCategory}`);
     return matchesSearch && matchesCategory;
   });
 
@@ -1097,28 +1070,6 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
-  },
-  categoryHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  categoryHeaderText: {
-    fontSize: 16,
-    fontWeight: "600",
-    color: Colors.text,
-  },
-  deselectButton: {
-    paddingVertical: 5,
-    paddingHorizontal: 10,
-    backgroundColor: Colors.error,
-    borderRadius: 15,
-  },
-  deselectButtonText: {
-    fontSize: 12,
-    color: Colors.background,
-    fontWeight: "600",
   },
   categoryScroll: {
     marginBottom: 20,

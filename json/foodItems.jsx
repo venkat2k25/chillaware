@@ -1,5 +1,4 @@
-
-[
+export const foodItem =[
   {
     name: "eggs",
     link: "https://images.pexels.com/photos/4045561/pexels-photo-4045561.jpeg?auto=compress&cs=tinysrgb&h=650&w=940",
