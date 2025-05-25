@@ -156,7 +156,7 @@ export default function ScanScreen() {
       let inventoryData = existingData ? JSON.parse(existingData) : [];
       const itemsToSave = inventoryToSave.map((item) => {
         return {
-          item: itemName,
+          item: item.item,
           quantity: item.quantity || 1,
           weight: item.weight || "",
           purchase_date: item.purchase_date || new Date().toISOString().split("T")[0],

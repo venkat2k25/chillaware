@@ -368,6 +368,7 @@ export default function InventoryScreen() {
 
   const loadInventoryData = async () => {
     try {
+      // await AsyncStorage.removeItem("inventory");
       const data = await AsyncStorage.getItem("inventory");
       if (data) {
         const parsedData = JSON.parse(data);
