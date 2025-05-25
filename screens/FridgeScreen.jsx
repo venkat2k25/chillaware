@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef } from "react";
 import {
   View,
   Text,
@@ -6,105 +6,154 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
-  Dimensions,
   Animated,
   ActivityIndicator,
   Platform,
   PermissionsAndroid,
-  FlatList,
-} from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
-import axios from 'axios';
+} from "react-native";
+import * as ImagePicker from "expo-image-picker";
+import axios from "axios";
+import Header from "../layouts/Header";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Entypo } from "@expo/vector-icons";
 
 // Colors utility
 const Colors = {
-  background: '#f8f9fa',
-  primary: '#4a90e2',
-  secondary: '#50c878',
-  accent: '#ff6b6b',
-  text: '#2c3e50',
-  lightGray: '#ecf0f1',
-  white: '#ffffff',
-  success: '#28a745',
-  warning: '#ffc107',
-  danger: '#dc3545',
-  overlay: 'rgba(0,0,0,0.3)',
+  background: "#f8f9fa",
+  primary: "#4a90e2",
+  secondary: "#50c878",
+  accent: "#ff6b6b",
+  text: "#2c3e50",
+  lightGray: "#ecf0f1",
+  white: "#ffffff",
+  success: "#28a745",
+  warning: "#ffc107",
+  danger: "#dc3545",
+  overlay: "rgba(0,0,0,0.3)",
 };
 
 // Food item icons mapping
 const FOOD_ICONS = {
-  apple: '🍎',
-  banana: '🍌',
-  orange: '🍊',
-  carrot: '🥕',
-  broccoli: '🥦',
-  potato: '🥔',
-  bottle: '🍼',
-  cup: '☕',
-  sandwich: '🥪',
-  pizza: '🍕',
-  cake: '🍰',
-  donut: '🍩',
-  bowl: '🍜',
-  'wine glass': '🍷',
-  'hot dog': '🌭',
-  spoon: '🥄',
-  knife: '🔪',
-  fork: '🍴',
-  default: '🥘',
+  apple: "🍎",
+  banana: "🍌",
+  orange: "🍊",
+  carrot: "🥕",
+  broccoli: "🥦",
+  potato: "🥔",
+  bottle: "🍼",
+  cup: "☕",
+  sandwich: "🥪",
+  pizza: "🍕",
+  cake: "🍰",
+  donut: "🍩",
+  bowl: "🍜",
+  "wine glass": "🍷",
+  "hot dog": "🌭",
+  spoon: "🥄",
+  knife: "🔪",
+  fork: "🍴",
+  default: "🥘",
+};
+
+// Subcategories JSON
+const subcategories = {
+  "🥦 Vegetarian": {
+    "Leafy Vegetables": ["Spinach", "Lettuce", "Kale", "Cabbage"],
+    "Root Vegetables": ["Carrot", "Potato", "Beetroot", "Radish"],
+    "Cruciferous Vegetables": ["Broccoli", "Cauliflower", "Brussels Sprouts"],
+    "Other Vegetables": [
+      "Cucumber",
+      "Onion",
+      "Tomato",
+      "Bell Pepper",
+      "Zucchini",
+      "Aubergine",
+      "Avocado",
+      "Sweetcorn",
+    ],
+  },
+  "🍗 Non-Vegetarian": {
+    Poultry: ["Chicken Breast", "Chicken Thigh", "Turkey"],
+    "Red Meat": ["Beef", "Lamb", "Pork"],
+    Seafood: ["Salmon", "Tuna", "Shrimp", "Crab"],
+    Eggs: ["Chicken Eggs", "Quail Eggs", "Eggs"],
+  },
+  "🥛 Dairy Products": {
+    Milk: ["Whole Milk", "Skim Milk", "Almond Milk", "Soy Milk", "Oat Milk"],
+    Cheese: ["Cheddar", "Mozzarella", "Parmesan", "Cream Cheese"],
+    Yogurt: ["Plain Yogurt", "Greek Yogurt", "Flavored Yogurt", "Yoghurt"],
+    "Butter & Cream": [
+      "Salted Butter",
+      "Unsalted Butter",
+      "Heavy Cream",
+      "Double Cream",
+    ],
+  },
+  "🧃 Drinks & Beverages": {
+    "Soft Drinks": ["Cola", "Lemonade", "Ginger Ale"],
+    Juices: ["Orange Juice", "Apple Juice", "Mango Juice"],
+    "Tea & Coffee": ["Green Tea", "Black Coffee", "Herbal Tea"],
+    "Alcoholic Beverages": ["Beer", "Wine", "Whiskey"],
+    Water: ["Still Water", "Sparkling Water"],
+  },
+  "🍿 Snacks": {
+    "Chips & Crisps": ["Potato Chips", "Tortilla Chips", "Pita Chips"],
+    "Nuts & Seeds": ["Almonds", "Cashews", "Sunflower Seeds", "Nuts"],
+    Popcorn: ["Butter Popcorn", "Caramel Popcorn"],
+    "Candy & Sweets": ["Chocolate Bars", "Gummies", "Hard Candy", "Caramel"],
+  },
+  "🌿 Greens & Herbs": {
+    "Fresh Herbs": ["Basil", "Cilantro", "Parsley", "Mint"],
+    "Salad Greens": ["Arugula", "Romaine", "Mixed Greens", "Spinach"],
+    Microgreens: ["Pea Shoots", "Radish Sprouts", "Sunflower Sprouts"],
+  },
+  "🧂 Condiments & Essentials": {
+    Sauces: ["Ketchup", "Mustard", "Soy Sauce", "Hot Sauce", "Pesto"],
+    Spices: ["Black Pepper", "Cumin", "Paprika", "Turmeric"],
+    Oils: ["Olive Oil", "Vegetable Oil", "Coconut Oil"],
+    Vinegars: ["Balsamic Vinegar", "Apple Cider Vinegar", "White Vinegar"],
+  },
+  "🌾 Grains & Staples": {
+    Rice: ["White Rice", "Brown Rice", "Basmati Rice", "Quinoa"],
+    Pasta: ["Spaghetti", "Penne", "Fusilli", "Noodles"],
+    Flours: ["All-Purpose Flour", "Whole Wheat Flour", "Almond Flour"],
+    Legumes: ["Lentils", "Chickpeas", "Black Beans"],
+  },
+  "🥐 Bakery & Breakfast Items": {
+    Bread: [
+      "White Bread",
+      "Sourdough",
+      "Whole Grain Bread",
+      "Rye Bread",
+      "Brioche",
+    ],
+    Pastries: ["Croissant", "Danish", "Muffin"],
+    Cereals: ["Oatmeal", "Corn Flakes", "Granola"],
+    "Breakfast Spreads": ["Peanut Butter", "Jam", "Honey", "Maple"],
+  },
 };
 
 // API Configuration
 const BACKEND_URL =
   Platform.OS === "ios"
-    ? "http://192.168.0.215:8001"
-    : "http://192.168.0.215:8001";
+    ? "https://fridge-backend-e2qc.onrender.com"
+    : "https://fridge-backend-e2qc.onrender.com";
 
 // Logger utility
 const logger = {
-  error: (message) => {
-    console.error(`[ERROR] ${new Date().toISOString()}: ${message}`);
-  },
-  info: (message) => {
-    console.log(`[INFO] ${new Date().toISOString()}: ${message}`);
-  }
+  error: (message) =>
+    console.error(`[ERROR] ${new Date().toISOString()}: ${message}`),
+  info: (message) =>
+    console.log(`[INFO] ${new Date().toISOString()}: ${message}`),
 };
 
 class FridgeAPI {
-  static async processFrame(imageData) {
-    try {
-      const formData = new FormData();
-      formData.append('file', {
-        uri: imageData.uri,
-        type: 'image/jpeg',
-        name: 'camera_image.jpg',
-      });
-
-      const response = await fetch(`${BACKEND_URL}/scan`, {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      return await response.json();
-    } catch (error) {
-      logger.error('Frame processing API error:', error);
-      throw error;
-    }
-  }
-
   static async processImage(imageData) {
     try {
       const formData = new FormData();
-      formData.append('file', {
+      formData.append("file", {
         uri: imageData.uri,
-        type: 'image/jpeg',
+        type: "image/jpeg",
         name: `photo_${Date.now()}.jpg`,
       });
 
@@ -112,16 +161,13 @@ class FridgeAPI {
         `${BACKEND_URL}/process_image`,
         formData,
         {
-          headers: {
-            'Content-Type': 'multipart/form-data',
-          },
+          headers: { "Content-Type": "multipart/form-data" },
           timeout: 45000,
         }
       );
-
       return response.data;
     } catch (error) {
-      logger.error('Image processing API error:', error);
+      logger.error(`Image processing API error: ${error.message}`);
       throw error;
     }
   }
@@ -129,12 +175,11 @@ class FridgeAPI {
   static async getInventory() {
     try {
       const response = await fetch(`${BACKEND_URL}/inventory`);
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
       return await response.json();
     } catch (error) {
-      logger.error('Get inventory API error:', error);
+      logger.error(`Get inventory API error: ${error.message}`);
       throw error;
     }
   }
@@ -142,11 +187,11 @@ class FridgeAPI {
   static async saveToInventory(inventoryItems) {
     try {
       const response = await axios.post(`${BACKEND_URL}/inventory/save`, {
-        items: inventoryItems
+        items: inventoryItems,
       });
       return response.data;
     } catch (error) {
-      logger.error('Save inventory API error:', error);
+      logger.error(`Save inventory API error: ${error.message}`);
       throw error;
     }
   }
@@ -154,29 +199,30 @@ class FridgeAPI {
   static async clearInventory() {
     try {
       const response = await fetch(`${BACKEND_URL}/inventory`, {
-        method: 'DELETE',
+        method: "DELETE",
       });
-      if (!response.ok) {
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
       return await response.json();
     } catch (error) {
-      logger.error('Clear inventory API error:', error);
+      logger.error(`Clear inventory API error: ${error.message}`);
       throw error;
     }
   }
 
   static async removeItem(itemName, count = 1) {
     try {
-      const response = await fetch(`${BACKEND_URL}/inventory/${itemName}?count=${count}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) {
+      const response = await fetch(
+        `${BACKEND_URL}/inventory/${itemName}?count=${count}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      }
       return await response.json();
     } catch (error) {
-      logger.error('Remove item API error:', error);
+      logger.error(`Remove item API error: ${error.message}`);
       throw error;
     }
   }
@@ -186,8 +232,8 @@ class FridgeAPI {
       const response = await fetch(`${BACKEND_URL}/health`);
       return await response.json();
     } catch (error) {
-      logger.error('Health check failed:', error);
-      return { status: 'offline' };
+      logger.error(`Health check failed: ${error.message}`);
+      return { status: "offline" };
     }
   }
 }
@@ -203,50 +249,87 @@ export default function RealtimeFridgeScanner() {
   const [libraryPermission, setLibraryPermission] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [loadingInventory, setLoadingInventory] = useState(false);
-  const [apiStatus, setApiStatus] = useState('checking');
+  const [apiStatus, setApiStatus] = useState("checking");
   const [cameraActive, setCameraActive] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [isUploaded, setIsUploaded] = useState(false);
-  const [detectedInventory, setDetectedInventory] = useState([]); // Initialize as empty array
-
-  // Animation refs
+  const [detectedInventory, setDetectedInventory] = useState([]);
   const fadeAnim = useRef(new Animated.Value(1)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     checkPermissions();
     checkApiHealth();
     loadInventory();
+    startPulseAnimation();
+    return () => Animated.timing(pulseAnim).stop();
   }, []);
 
-  useEffect(() => {
-    logger.info('detectedInventory updated:', detectedInventory);
-  }, [detectedInventory]);
+  const startPulseAnimation = () => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  };
+
+  const assignCategoryAndSubcategory = (itemName) => {
+    let parentCategory = "Unknown Category";
+    let subCategory = "Unknown Subcategory";
+    const normalizedItem = itemName.toLowerCase().replace(/[^a-z0-9\s]/g, "");
+
+    for (const [parent, subCats] of Object.entries(subcategories)) {
+      for (const [subCat, items] of Object.entries(subCats)) {
+        if (
+          items.some((subItem) =>
+            normalizedItem.includes(
+              subItem.toLowerCase().replace(/[^a-z0-9\s]/g, "")
+            )
+          ) ||
+          normalizedItem.includes(
+            subCat.toLowerCase().replace(/[^a-z0-9\s]/g, "")
+          )
+        ) {
+          parentCategory = parent;
+          subCategory = subCat;
+          return { parentCategory, subCategory };
+        }
+      }
+    }
+    return { parentCategory, subCategory };
+  };
 
   const checkPermissions = async () => {
     try {
-      // Check camera permission
       const cameraResult = await ImagePicker.requestCameraPermissionsAsync();
-      setCameraPermission(cameraResult.status === 'granted');
-
-      // Check media library permission
-      const libraryResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      setLibraryPermission(libraryResult.status === 'granted');
-
-      if (Platform.OS === 'android') {
+      setCameraPermission(cameraResult.status === "granted");
+      const libraryResult =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      setLibraryPermission(libraryResult.status === "granted");
+      if (Platform.OS === "android") {
         const granted = await PermissionsAndroid.request(
           PermissionsAndroid.PERMISSIONS.CAMERA,
           {
-            title: 'Camera Permission',
-            message: 'This app needs camera access to scan food items',
-            buttonNeutral: 'Ask Me Later',
-            buttonNegative: 'Cancel',
-            buttonPositive: 'OK',
+            title: "Camera Permission",
+            message: "This app needs camera access to scan food items",
+            buttonNeutral: "Ask Me Later",
+            buttonNegative: "Cancel",
+            buttonPositive: "OK",
           }
         );
         setCameraPermission(granted === PermissionsAndroid.RESULTS.GRANTED);
       }
     } catch (error) {
-      logger.error('Permission check failed:', error);
+      logger.error(`Permission check failed: ${error.message}`);
       setCameraPermission(false);
       setLibraryPermission(false);
     }
@@ -255,9 +338,9 @@ export default function RealtimeFridgeScanner() {
   const checkApiHealth = async () => {
     try {
       const health = await FridgeAPI.getHealth();
-      setApiStatus(health.status === 'healthy' ? 'online' : 'offline');
+      setApiStatus(health.status === "healthy" ? "online" : "offline");
     } catch (error) {
-      setApiStatus('offline');
+      setApiStatus("offline");
     }
   };
 
@@ -266,17 +349,20 @@ export default function RealtimeFridgeScanner() {
       const inventoryData = await FridgeAPI.getInventory();
       setInventory(inventoryData);
     } catch (error) {
-      logger.error('Failed to load inventory:', error);
+      logger.error(`Failed to load inventory: ${error.message}`);
     }
   };
 
   const captureImageWithCamera = async () => {
     if (!cameraPermission) {
-      Alert.alert('Permission Required', 'Camera permission is required to take photos.');
+      Alert.alert(
+        "Permission Required",
+        "Camera permission is required to take photos."
+      );
       return;
     }
-    if (apiStatus === 'offline') {
-      Alert.alert('API Offline', 'Backend server is not available.');
+    if (apiStatus === "offline") {
+      Alert.alert("API Offline", "Backend server is not available.");
       return;
     }
     if (isProcessing) return;
@@ -292,33 +378,35 @@ export default function RealtimeFridgeScanner() {
 
       if (!result.canceled && result.assets?.[0]?.uri) {
         const image = result.assets[0];
-        if (!image.mimeType?.includes('image/jpeg')) {
-          Alert.alert('Invalid Format', 'Please capture a JPEG image.');
+        if (!image.mimeType?.includes("image/jpeg")) {
+          Alert.alert("Invalid Format", "Please capture a JPEG image.");
           setIsProcessing(false);
           return;
         }
         setPhoto(image);
         setIsUploaded(false);
         setDetectedInventory([]);
-        logger.info('Captured image from camera:', image.uri);
         await uploadToBackend(image);
       } else {
         setIsProcessing(false);
       }
     } catch (error) {
-      logger.error('Error capturing photo:', error);
-      Alert.alert('Error', 'Failed to capture photo. Please try again.');
+      logger.error(`Error capturing photo: ${error.message}`);
+      Alert.alert("Error", "Failed to capture photo. Please try again.");
       setIsProcessing(false);
     }
   };
 
   const pickImageFromLibrary = async () => {
     if (!libraryPermission) {
-      Alert.alert('Permission Required', 'Media library permission is required to select photos.');
+      Alert.alert(
+        "Permission Required",
+        "Media library permission is required to select photos."
+      );
       return;
     }
-    if (apiStatus === 'offline') {
-      Alert.alert('API Offline', 'Backend server is not available.');
+    if (apiStatus === "offline") {
+      Alert.alert("API Offline", "Backend server is not available.");
       return;
     }
     if (isProcessing) return;
@@ -334,27 +422,26 @@ export default function RealtimeFridgeScanner() {
 
       if (!result.canceled && result.assets?.[0]?.uri) {
         const image = result.assets[0];
-        if (!image.mimeType?.includes('image/jpeg')) {
-          Alert.alert('Invalid Format', 'Please select a JPEG image.');
+        if (!image.mimeType?.includes("image/jpeg")) {
+          Alert.alert("Invalid Format", "Please select a JPEG image.");
           setIsProcessing(false);
           return;
         }
         setPhoto(image);
         setIsUploaded(false);
         setDetectedInventory([]);
-        logger.info('Selected image from library:', image.uri);
         await uploadToBackend(image);
       } else {
         setIsProcessing(false);
       }
     } catch (error) {
-      logger.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to select image. Please try again.');
+      logger.error(`Error picking image: ${error.message}`);
+      Alert.alert("Error", "Failed to select image. Please try again.");
       setIsProcessing(false);
     }
   };
 
-  const uploadToBackend = async (image) => {
+  const uploadToBackend = async (image, retries = 2) => {
     const data = new FormData();
     data.append("file", {
       uri: image.uri,
@@ -364,30 +451,22 @@ export default function RealtimeFridgeScanner() {
 
     try {
       setLoadingInventory(true);
-      logger.info(`Uploading image to ${BACKEND_URL}/process_image`);
       const backendRes = await axios.post(
         `${BACKEND_URL}/process_image`,
         data,
         {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
+          headers: { "Content-Type": "multipart/form-data" },
           timeout: 45000,
         }
       );
 
-      logger.info('Backend response:', JSON.stringify(backendRes.data, null, 2));
       setLoadingInventory(false);
       setIsUploaded(true);
-
       const detections = backendRes.data?.detections || [];
       if (Array.isArray(detections)) {
         setDetectedInventory(detections);
-        logger.info(`Received ${detections.length} item(s):`, detections.map(d => d.item));
-
         if (detections.length > 0) {
           await saveToInventory(detections);
-
           Animated.sequence([
             Animated.timing(fadeAnim, {
               toValue: 0.7,
@@ -400,55 +479,53 @@ export default function RealtimeFridgeScanner() {
               useNativeDriver: true,
             }),
           ]).start();
-
           Alert.alert(
-            'Items Detected',
-            `Successfully detected ${detections.length} item(s): ${detections.map(d => d.item).join(', ')}`,
-            [{ text: 'OK' }]
+            "Items Detected",
+            `Successfully detected ${detections.length} item(s): ${detections
+              .map((d) => d.item)
+              .join(", ")}`,
+            [{ text: "OK" }]
           );
         } else {
-          logger.warn('No items detected in backend response');
           Alert.alert(
-            'No Items Detected',
-            'No items were detected in the image. Try a clearer image with better lighting or different food items.'
+            "No Items Detected",
+            "No items were detected in the image. Try a clearer image with better lighting."
           );
           setPhoto(null);
           setIsUploaded(false);
         }
       } else {
-        logger.error('Invalid detections format:', backendRes.data);
+        logger.error(
+          `Invalid detections format: ${JSON.stringify(backendRes.data)}`
+        );
         setDetectedInventory([]);
         Alert.alert(
-          'Error',
-          'Received invalid detection data from backend. Please try again.'
+          "Error",
+          "Received invalid detection data from backend. Please try again."
         );
         setPhoto(null);
         setIsUploaded(false);
       }
     } catch (err) {
-      logger.error('Error uploading image:', err);
       setLoadingInventory(false);
       setIsUploaded(false);
-
-      let errorMessage = 'Could not process the image. Please ensure the backend server is running and try again.';
+      if (retries > 0) {
+        logger.info(`Retrying upload (${retries} attempts left)...`);
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        return uploadToBackend(image, retries - 1);
+      }
+      let errorMessage =
+        "Could not process the image. Please ensure the backend server is running and try again.";
       if (err.response) {
         errorMessage = `Backend Error: ${err.response.status} - ${
           err.response.data?.detail || err.response.data || err.message
         }`;
-        logger.error(
-          `Backend responded with status ${err.response.status}: ${
-            err.response.data?.detail || err.response.data
-          }`
-        );
       } else if (err.request) {
-        errorMessage = `Network Error: Could not connect to ${BACKEND_URL}. Please ensure the server is running and reachable.`;
-        logger.error(`Network Error: No response from ${BACKEND_URL}`);
+        errorMessage = `Network Error: Could not connect to ${BACKEND_URL}.`;
       } else {
         errorMessage = `Request Error: ${err.message}`;
-        logger.error(`Axios request setup error: ${err.message}`);
       }
-
-      Alert.alert('Upload Failed', errorMessage);
+      Alert.alert("Upload Failed", errorMessage);
       setDetectedInventory([]);
       setPhoto(null);
     } finally {
@@ -458,27 +535,45 @@ export default function RealtimeFridgeScanner() {
 
   const saveToInventory = async (detections) => {
     try {
-      const inventoryItems = detections.map((detection) => ({
-        name: detection.item,
-        count: detection.count || 1,
-        category: detection.category || 'Other',
-      }));
+      const inventoryItems = detections.map((detection) => {
+        const { parentCategory, subCategory } = assignCategoryAndSubcategory(
+          detection.item
+        );
+        return {
+          name: detection.item,
+          count: detection.count || 1,
+          category: parentCategory,
+          subCategory,
+        };
+      });
 
       await FridgeAPI.saveToInventory(inventoryItems);
+
+      const storedData = await AsyncStorage.getItem("inventory");
+      const existingData = storedData ? JSON.parse(storedData) : [];
+      const newItems = inventoryItems.map((item) => ({
+        item: item.name,
+        quantity: item.count,
+        purchase_date: new Date().toISOString().split("T")[0],
+        weight: "N/A",
+        expiry_date: "N/A",
+        parentCategory: item.category,
+        subCategory: item.subCategory,
+      }));
+      const updatedData = [...existingData, ...newItems];
+      await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
 
       const newInventory = { ...inventory };
       inventoryItems.forEach((item) => {
         const itemName = item.name;
-        const itemCategory = item.category;
-        const itemCount = item.count;
-
         if (newInventory.items[itemName]) {
-          newInventory.items[itemName].count += itemCount;
+          newInventory.items[itemName].count += item.count;
         } else {
           newInventory.items[itemName] = {
             name: itemName,
-            count: itemCount,
-            category: itemCategory,
+            count: item.count,
+            category: item.category,
+            subCategory: item.subCategory,
             last_detected: new Date().toISOString(),
           };
         }
@@ -489,7 +584,6 @@ export default function RealtimeFridgeScanner() {
         0
       );
       newInventory.unique_items = Object.keys(newInventory.items).length;
-
       const categories = {};
       Object.values(newInventory.items).forEach((item) => {
         if (categories[item.category]) {
@@ -501,20 +595,25 @@ export default function RealtimeFridgeScanner() {
       newInventory.categories = categories;
 
       setInventory(newInventory);
-      logger.info(`Successfully saved ${inventoryItems.length} items to inventory`);
+      logger.info(
+        `Successfully saved ${inventoryItems.length} items to inventory`
+      );
     } catch (error) {
       logger.error(`Failed to save inventory: ${error.message}`);
-      Alert.alert('Error', 'Failed to save items to inventory');
+      Alert.alert("Error", "Failed to save items to inventory");
     }
   };
 
   const toggleCamera = () => {
     if (!cameraPermission) {
-      Alert.alert('Permission Required', 'Camera permission is required to scan items.');
+      Alert.alert(
+        "Permission Required",
+        "Camera permission is required to scan items."
+      );
       return;
     }
-    if (apiStatus === 'offline') {
-      Alert.alert('API Offline', 'Backend server is not available.');
+    if (apiStatus === "offline") {
+      Alert.alert("API Offline", "Backend server is not available.");
       return;
     }
     setCameraActive(!cameraActive);
@@ -524,32 +623,29 @@ export default function RealtimeFridgeScanner() {
   };
 
   const clearFridge = () => {
-    Alert.alert(
-      'Clear Fridge',
-      'Are you sure you want to remove all items?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Clear',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              setInventory({
-                items: {},
-                total_items: 0,
-                unique_items: 0,
-                categories: {},
-              });
-              await FridgeAPI.clearInventory();
-              Alert.alert('Success', 'Fridge cleared successfully!');
-            } catch (error) {
-              logger.error('Failed to clear inventory:', error);
-              Alert.alert('Error', 'Failed to clear fridge');
-            }
-          },
+    Alert.alert("Clear Fridge", "Are you sure you want to remove all items?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Clear",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            setInventory({
+              items: {},
+              total_items: 0,
+              unique_items: 0,
+              categories: {},
+            });
+            await FridgeAPI.clearInventory();
+            await AsyncStorage.setItem("inventory", JSON.stringify([]));
+            Alert.alert("Success", "Fridge cleared successfully!");
+          } catch (error) {
+            logger.error(`Failed to clear inventory: ${error.message}`);
+            Alert.alert("Error", "Failed to clear fridge");
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   const removeItemFromInventory = async (itemName, count = 1) => {
@@ -566,7 +662,6 @@ export default function RealtimeFridgeScanner() {
           0
         );
         newInventory.unique_items = Object.keys(newInventory.items).length;
-
         const categories = {};
         Object.values(newInventory.items).forEach((item) => {
           if (categories[item.category]) {
@@ -579,21 +674,19 @@ export default function RealtimeFridgeScanner() {
 
         setInventory(newInventory);
         await FridgeAPI.removeItem(itemName, count);
+
+        const storedData = await AsyncStorage.getItem("inventory");
+        if (storedData) {
+          const parsedData = JSON.parse(storedData);
+          const updatedData = parsedData.filter(
+            (item) => item.item !== itemName || item.quantity > count
+          );
+          await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
+        }
       }
     } catch (error) {
-      logger.error('Failed to remove item:', error);
-      Alert.alert('Error', 'Failed to remove item');
-    }
-  };
-
-  const getStatusColor = () => {
-    switch (apiStatus) {
-      case 'online':
-        return Colors.success;
-      case 'offline':
-        return Colors.danger;
-      default:
-        return Colors.warning;
+      logger.error(`Failed to remove item: ${error.message}`);
+      Alert.alert("Error", "Failed to remove item");
     }
   };
 
@@ -617,7 +710,10 @@ export default function RealtimeFridgeScanner() {
           <Text style={styles.permissionSubtitle}>
             Please grant camera and media library permissions to scan food items
           </Text>
-          <TouchableOpacity style={styles.permissionButton} onPress={checkPermissions}>
+          <TouchableOpacity
+            style={styles.permissionButton}
+            onPress={checkPermissions}
+          >
             <Text style={styles.permissionButtonText}>Grant Permissions</Text>
           </TouchableOpacity>
         </View>
@@ -625,25 +721,38 @@ export default function RealtimeFridgeScanner() {
     );
   }
 
-  return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Smart Fridge Scanner</Text>
-        <View style={[styles.statusIndicator, { backgroundColor: getStatusColor() }]}>
-          <Text style={styles.statusText}>API: {apiStatus.toUpperCase()}</Text>
-        </View>
-      </View>
+  const createGrid = () => {
+    const items = Object.entries(inventory.items);
+    const grid = Array(8)
+      .fill()
+      .map(() => Array(5).fill(null));
+    let itemIndex = 0;
 
+    for (let row = 0; row < 8; row++) {
+      for (let col = 0; col < 5; col++) {
+        if (itemIndex < items.length) {
+          grid[row][col] = items[itemIndex];
+          itemIndex++;
+        }
+      }
+    }
+
+    return grid;
+  };
+
+  return (
+    <View style={styles.container}>
+      <Header />
       {cameraActive ? (
-        /* Image Picker View */
         <View style={styles.cameraContainer}>
           <View style={styles.cameraOverlay}>
             {loadingInventory ? (
               <View style={styles.scanningIndicator}>
                 <ActivityIndicator size="large" color={Colors.white} />
                 <Text style={styles.scanningText}>Processing Image...</Text>
-                <Text style={styles.scanningSubtext}>This may take up to 45 seconds</Text>
+                <Text style={styles.scanningSubtext}>
+                  This may take up to 45 seconds
+                </Text>
               </View>
             ) : isProcessing ? (
               <View style={styles.scanningIndicator}>
@@ -657,7 +766,10 @@ export default function RealtimeFridgeScanner() {
                   detectedInventory.map((item, index) => (
                     <View key={index} style={styles.detectedItem}>
                       <Text style={styles.detectedItemText}>
-                        {FOOD_ICONS[item.item] || FOOD_ICONS.default} {item.item} (x{item.count}, {Math.round(item.confidence * 100)}%, {item.category})
+                        {FOOD_ICONS[item.item.toLowerCase()] ||
+                          FOOD_ICONS.default}{" "}
+                        {item.item} (x{item.count},{" "}
+                        {Math.round(item.confidence * 100)}%, {item.category})
                       </Text>
                     </View>
                   ))
@@ -677,12 +789,7 @@ export default function RealtimeFridgeScanner() {
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.cameraButton, styles.cancelButton]}
-                    onPress={() => {
-                      setCameraActive(false);
-                      setDetectedInventory([]);
-                      setPhoto(null);
-                      setIsUploaded(false);
-                    }}
+                    onPress={toggleCamera}
                   >
                     <Text style={styles.cameraButtonText}>❌ Close</Text>
                   </TouchableOpacity>
@@ -691,7 +798,9 @@ export default function RealtimeFridgeScanner() {
             ) : (
               <>
                 <Text style={styles.scanningText}>📷 Scan Food Items</Text>
-                <Text style={styles.scanningSubtext}>Choose an option to add items to your inventory</Text>
+                <Text style={styles.scanningSubtext}>
+                  Choose an option to add items to your inventory
+                </Text>
                 <View style={styles.cameraControls}>
                   <TouchableOpacity
                     style={styles.cameraButton}
@@ -705,7 +814,9 @@ export default function RealtimeFridgeScanner() {
                     onPress={pickImageFromLibrary}
                     disabled={isProcessing || loadingInventory}
                   >
-                    <Text style={styles.cameraButtonText}>🖼️ Pick from Gallery</Text>
+                    <Text style={styles.cameraButtonText}>
+                      🖼️ Pick from Gallery
+                    </Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[styles.cameraButton, styles.cancelButton]}
@@ -719,73 +830,67 @@ export default function RealtimeFridgeScanner() {
           </View>
         </View>
       ) : (
-        /* Inventory View */
-        <View style={styles.content}>
+        <ScrollView
+          style={styles.content}
+          contentContainerStyle={{ paddingBottom: 100 }}
+        >
           <View style={styles.summaryContainer}>
             <View style={styles.summaryHeader}>
-              <Text style={styles.summaryTitle}>Inventory</Text>
+              <Text style={styles.summaryTitle}>Fridge</Text>
               <View style={styles.summaryStats}>
                 <Text style={styles.summaryStatText}>
-                  {inventory.total_items} total items • {inventory.unique_items} unique
+                  {inventory.total_items} total items
                 </Text>
               </View>
             </View>
-            
             {Object.keys(inventory.items).length === 0 ? (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyIcon}>🥡</Text>
                 <Text style={styles.emptyText}>Your fridge is empty!</Text>
-                <Text style={styles.emptySubtext}>Scan items to add them to your inventory</Text>
+                <Text style={styles.emptySubtext}>
+                  Scan items to add them to your inventory
+                </Text>
               </View>
             ) : (
-              <FlatList
-                data={Object.entries(inventory.items)}
-                keyExtractor={([itemName]) => itemName}
-                renderItem={({item: [itemName, item]}) => (
-                  <View style={styles.summaryItem}>
-                    <View style={styles.summaryItemLeft}>
-                      <Text style={styles.summaryIcon}>{FOOD_ICONS[itemName] || FOOD_ICONS.default}</Text>
-                      <View style={styles.summaryItemInfo}>
-                        <Text style={styles.summaryItemName}>{itemName}</Text>
-                        <Text style={styles.summaryItemCategory}>{item.category}</Text>
-                        {item.last_detected && (
-                          <Text style={styles.summaryItemDate}>
-                            Last detected: {new Date(item.last_detected).toLocaleDateString()}
+              <View style={styles.gridContainer}>
+                {createGrid().map((row, rowIndex) => (
+                  <View key={rowIndex} style={styles.row}>
+                    {row.map((item, colIndex) =>
+                      item ? (
+                        <View key={item[0]} style={styles.fridgeBox}>
+                          <Text style={styles.summaryIcon}>
+                            {FOOD_ICONS[item[0].toLowerCase()] ||
+                              FOOD_ICONS.default}
                           </Text>
-                        )}
-                      </View>
-                    </View>
-                    <View style={styles.summaryItemRight}>
-                      <Text style={styles.summaryItemCount}>{item.count}</Text>
-                      <TouchableOpacity
-                        style={styles.removeButton}
-                        onPress={() => removeItemFromInventory(itemName)}
-                      >
-                        <Text style={styles.removeButtonText}>-</Text>
-                      </TouchableOpacity>
-                    </View>
+                          {/* <Text style={styles.itemText}>{item[0]}</Text> */}
+                          <View style={styles.countBadge}>
+                            <Text style={styles.itemCount}>{item[1].count}</Text>
+                          </View>
+                        </View>
+                      ) : (
+                        <View key={`empty-${rowIndex}-${colIndex}`} style={styles.fridgeBox}>
+                          {/* <Text style={styles.summaryIcon}>🧊</Text>
+                          <Text style={styles.itemText}>Empty</Text> */}
+                        </View>
+                      )
+                    )}
                   </View>
-                )}
-                showsVerticalScrollIndicator={false}
-              />
+                ))}
+              </View>
             )}
           </View>
-          
-          {Object.keys(inventory.items).length > 0 && (
-            <TouchableOpacity style={styles.clearButton} onPress={clearFridge}>
-              <Text style={styles.clearButtonText}>Clear Fridge</Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        </ScrollView>
       )}
-
-      {/* Floating Action Button */}
       {!cameraActive && (
-        <TouchableOpacity style={styles.fab} onPress={toggleCamera}>
-          <Text style={styles.fabText}>📷</Text>
-        </TouchableOpacity>
+        <Animated.View
+          style={[styles.fab, { transform: [{ scale: pulseAnim }] }]}
+        >
+          <TouchableOpacity onPress={captureImageWithCamera}>
+            <Entypo name="camera" size={24} color={Colors.background} />
+          </TouchableOpacity>
+        </Animated.View>
       )}
-    </Animated.View>
+    </View>
   );
 }
 
@@ -794,57 +899,28 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: Colors.background,
   },
-  header: {
-    backgroundColor: Colors.primary,
-    paddingTop: Platform.OS === 'ios' ? 50 : 30,
-    paddingBottom: 15,
-    paddingHorizontal: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.white,
-    textAlign: 'center',
-  },
   content: {
-    flex: 1,
-    padding: 20,
-  },
-  statusIndicator: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-    alignSelf: 'flex-start',
-    marginBottom: 20,
-  },
-  statusText: {
-    color: Colors.white,
-    fontSize: 12,
-    fontWeight: 'bold',
+    paddingTop: 80,
+    paddingHorizontal: 15,
   },
   cameraContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   cameraOverlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: Colors.overlay,
-    width: '100%',
+    width: "100%",
   },
   scanningIndicator: {
-    alignItems: 'center',
+    alignItems: "center",
   },
   scanningText: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.white,
     marginBottom: 10,
   },
@@ -855,25 +931,25 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   detectionResults: {
-    alignItems: 'center',
+    alignItems: "center",
     padding: 20,
-    width: '100%',
+    width: "100%",
   },
   detectedItem: {
     marginVertical: 5,
     padding: 10,
     backgroundColor: Colors.white,
     borderRadius: 10,
-    width: '80%',
+    width: "80%",
   },
   detectedItemText: {
     fontSize: 16,
     color: Colors.text,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   cameraControls: {
-    flexDirection: 'column',
-    alignItems: 'center',
+    flexDirection: "column",
+    alignItems: "center",
     gap: 10,
   },
   cameraButton: {
@@ -881,7 +957,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 10,
-    marginHorizontal: 10,
   },
   cancelButton: {
     backgroundColor: Colors.danger,
@@ -889,12 +964,12 @@ const styles = StyleSheet.create({
   cameraButtonText: {
     color: Colors.white,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   centerContent: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   permissionText: {
@@ -903,7 +978,7 @@ const styles = StyleSheet.create({
   },
   permissionTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.text,
     marginBottom: 10,
   },
@@ -911,7 +986,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
     opacity: 0.7,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
   },
   permissionButton: {
@@ -923,7 +998,7 @@ const styles = StyleSheet.create({
   permissionButtonText: {
     color: Colors.white,
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   loadingText: {
     fontSize: 16,
@@ -934,90 +1009,36 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.white,
     borderRadius: 15,
     padding: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
-  summaryTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.text,
+  summaryHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     marginBottom: 15,
   },
-  summaryItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.lightGray,
-  },
-  summaryItemLeft: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  summaryIcon: {
-    fontSize: 24,
-    marginRight: 15,
-  },
-  summaryItemInfo: {
-    flex: 1,
-  },
-  summaryItemName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  summaryItemCategory: {
-    fontSize: 12,
-    color: Colors.text,
-    opacity: 0.7,
-    marginTop: 2,
-  },
-  summaryItemRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  summaryItemCount: {
+  summaryTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
-    color: Colors.primary,
-    marginRight: 15,
-    minWidth: 30,
-    textAlign: 'center',
+    fontWeight: "600",
+    color: Colors.text,
   },
-  removeButton: {
-    backgroundColor: Colors.danger,
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
+  summaryStats: {
+    flexDirection: "row",
+    alignItems: "center",
   },
-  removeButtonText: {
-    color: Colors.white,
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  clearButton: {
-    backgroundColor: Colors.danger,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 20,
-    alignSelf: 'center',
-    marginTop: 20,
-  },
-  clearButtonText: {
-    color: Colors.white,
-    fontWeight: 'bold',
+  summaryStatText: {
     fontSize: 14,
+    color: Colors.text,
+    opacity: 0.8,
   },
   emptyState: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     padding: 20,
   },
   emptyIcon: {
@@ -1026,7 +1047,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     color: Colors.text,
     marginBottom: 5,
   },
@@ -1036,22 +1057,61 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   fab: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 30,
     right: 20,
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: Colors.primary,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
+    backgroundColor: Colors.text,
+    justifyContent: "center",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 10,
   },
-  fabText: {
-    fontSize: 24,
+  gridContainer: {
+    marginTop: 10,
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+  },
+  fridgeBox: {
+    width: "18%", 
+    aspectRatio: 1,
+    borderRadius: 15,
+    alignItems: "center",
+    justifyContent: "center",
+    position: "relative",
+    backgroundColor: Colors.lightGray,
+  },
+  summaryIcon: {
+    fontSize: 36,
+  },
+  // itemText: {
+  //   fontSize: 12,
+  //   fontWeight: "500",
+  //   marginTop: 5,
+  //   textAlign: "center",
+  // },
+  countBadge: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    backgroundColor: Colors.text,
+    borderRadius: 50,
+    padding: 5,
+    minWidth: 22,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  itemCount: {
+    color: Colors.background,
+    fontSize: 12,
+    fontWeight: "500",
   },
 });
