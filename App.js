@@ -8,7 +8,6 @@ import { useFonts } from 'expo-font';
 import MainTab from './navigations/MainTab';
 import Colors from './utils/Colors';
 import NotificationScreen from './screens/NotificationScreen';
-import InstructionNav from './navigations/InstructionNav';
 
 const Stack = createNativeStackNavigator();
 
@@ -38,7 +37,6 @@ export default function App() {
             >
               <Stack.Screen name="MainTab" component={MainTab} />
               <Stack.Screen name="Notification" component={NotificationScreen} />
-              <Stack.Screen name="InstructionNav" component={InstructionNav} />
             </Stack.Navigator>
           </NavigationContainer>
         </View>

@@ -73,17 +73,17 @@ class FridgeAPI {
     }
   }
 
-  // static async saveToInventory(inventoryItems) {
-  //   try {
-  //     const response = await axios.post(`${BACKEND_URL}/inventory/save`, {
-  //       items: inventoryItems,
-  //     });
-  //     return response.data;
-  //   } catch (error) {
-  //     logger.error(`Save inventory API error: ${error.message}`);
-  //     throw error;
-  //   }
-  // }
+  static async saveToInventory(inventoryItems) {
+    try {
+      const response = await axios.post(`${BACKEND_URL}/inventory/save`, {
+        items: inventoryItems,
+      });
+      return response.data;
+    } catch (error) {
+      logger.error(`Save inventory API error: ${error.message}`);
+      throw error;
+    }
+  }
 
   static async clearInventory() {
     try {
@@ -329,7 +329,11 @@ export default function RealtimeFridgeScanner() {
       if (Array.isArray(detections)) {
         setDetectedInventory(detections);
         if (detections.length > 0) {
-          // await saveToInventory(detections);
+          // Save detected items to inventory and reload inventory
+          setLoadingInventory(true);
+          await saveToInventory(detections);
+          await loadInventory();
+          setLoadingInventory(false);
           Animated.sequence([
             Animated.timing(fadeAnim, {
               toValue: 0.7,
@@ -396,67 +400,69 @@ export default function RealtimeFridgeScanner() {
     }
   };
 
-  // const saveToInventory = async (detections) => {
-  //   try {
-  //     const inventoryItems = detections.map((detection) => {
-  //       return {
-  //         name: detection.item,
-  //         count: detection.count || 1,
-  //       };
-  //     });
+ const saveToInventory = async (detections) => {
+   try {
+     const inventoryItems = detections.map((detection) => {
+       return {
+         name: detection.item,
+         count: detection.count || 1,
+         category: detection.category || "Other",
+         confidence: detection.confidence || 0.5,
+       };
+     });
 
-  //     await FridgeAPI.saveToInventory(inventoryItems);
+     await FridgeAPI.saveToInventory(inventoryItems);
 
-  //     const storedData = await AsyncStorage.getItem("inventory");
-  //     const existingData = storedData ? JSON.parse(storedData) : [];
-  //     const newItems = inventoryItems.map((item) => ({
-  //       item: item.name,
-  //       quantity: item.count,
-  //       purchase_date: new Date().toISOString().split("T")[0],
-  //       weight: "N/A",
-  //       expiry_date: "N/A",
-  //     }));
-  //     const updatedData = [...existingData, ...newItems];
-  //     await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
+     const storedData = await AsyncStorage.getItem("inventory");
+     const existingData = storedData ? JSON.parse(storedData) : [];
+     const newItems = inventoryItems.map((item) => ({
+       item: item.name,
+       quantity: item.count,
+       purchase_date: new Date().toISOString().split("T")[0],
+       weight: "N/A",
+       expiry_date: "N/A",
+     }));
+     const updatedData = [...existingData, ...newItems];
+     await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
 
-  //     const newInventory = { ...inventory };
-  //     inventoryItems.forEach((item) => {
-  //       const itemName = item.name;
-  //       if (newInventory.items[itemName]) {
-  //         newInventory.items[itemName].count += item.count;
-  //       } else {
-  //         newInventory.items[itemName] = {
-  //           name: itemName,
-  //           count: item.count,
-  //           last_detected: new Date().toISOString(),
-  //         };
-  //       }
-  //     });
+     const newInventory = { ...inventory };
+     inventoryItems.forEach((item) => {
+       const itemName = item.name;
+       if (newInventory.items[itemName]) {
+         newInventory.items[itemName].count += item.count;
+       } else {
+         newInventory.items[itemName] = {
+           name: itemName,
+           count: item.count,
+           last_detected: new Date().toISOString(),
+         };
+       }
+     });
 
-  //     newInventory.total_items = Object.values(newInventory.items).reduce(
-  //       (sum, item) => sum + item.count,
-  //       0
-  //     );
-  //     newInventory.unique_items = Object.keys(newInventory.items).length;
-  //     const categories = {};
-  //     Object.values(newInventory.items).forEach((item) => {
-  //       if (categories[item.category]) {
-  //         categories[item.category] += item.count;
-  //       } else {
-  //         categories[item.category] = item.count;
-  //       }
-  //     });
-  //     newInventory.categories = categories;
+     newInventory.total_items = Object.values(newInventory.items).reduce(
+       (sum, item) => sum + item.count,
+       0
+     );
+     newInventory.unique_items = Object.keys(newInventory.items).length;
+     const categories = {};
+     Object.values(newInventory.items).forEach((item) => {
+       if (categories[item.category]) {
+         categories[item.category] += item.count;
+       } else {
+         categories[item.category] = item.count;
+       }
+     });
+     newInventory.categories = categories;
 
-  //     setInventory(newInventory);
-  //     logger.info(
-  //       `Successfully saved ${inventoryItems.length} items to inventory`
-  //     );
-  //   } catch (error) {
-  //     logger.error(`Failed to save inventory: ${error.message}`);
-  //     Alert.alert("Error", "Failed to save items to inventory");
-  //   }
-  // };
+     setInventory(newInventory);
+     logger.info(
+       `Successfully saved ${inventoryItems.length} items to inventory`
+     );
+   } catch (error) {
+     logger.error(`Failed to save inventory: ${error.message}`);
+     Alert.alert("Error", "Failed to save items to inventory");
+   }
+ };
 
   const toggleCamera = () => {
     if (!cameraPermission) {
