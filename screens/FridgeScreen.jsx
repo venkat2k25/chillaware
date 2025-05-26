@@ -16,128 +16,17 @@ import axios from "axios";
 import Header from "../layouts/Header";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Entypo } from "@expo/vector-icons";
+import Colors from "../utils/Colors";
+import { FOOD_ICONS } from "../json/foods";
 
-// Colors utility
-const Colors = {
-  background: "#f8f9fa",
-  primary: "#4a90e2",
-  secondary: "#50c878",
-  accent: "#ff6b6b",
-  text: "#2c3e50",
-  lightGray: "#ecf0f1",
-  white: "#ffffff",
-  success: "#28a745",
-  warning: "#ffc107",
-  danger: "#dc3545",
-  overlay: "rgba(0,0,0,0.3)",
-};
 
 // Food item icons mapping
-const FOOD_ICONS = {
-  apple: "🍎",
-  banana: "🍌",
-  orange: "🍊",
-  carrot: "🥕",
-  broccoli: "🥦",
-  potato: "🥔",
-  bottle: "🍼",
-  cup: "☕",
-  sandwich: "🥪",
-  pizza: "🍕",
-  cake: "🍰",
-  donut: "🍩",
-  bowl: "🍜",
-  "wine glass": "🍷",
-  "hot dog": "🌭",
-  spoon: "🥄",
-  knife: "🔪",
-  fork: "🍴",
-  default: "🥘",
-};
-
-// Subcategories JSON
-const subcategories = {
-  "🥦 Vegetarian": {
-    "Leafy Vegetables": ["Spinach", "Lettuce", "Kale", "Cabbage"],
-    "Root Vegetables": ["Carrot", "Potato", "Beetroot", "Radish"],
-    "Cruciferous Vegetables": ["Broccoli", "Cauliflower", "Brussels Sprouts"],
-    "Other Vegetables": [
-      "Cucumber",
-      "Onion",
-      "Tomato",
-      "Bell Pepper",
-      "Zucchini",
-      "Aubergine",
-      "Avocado",
-      "Sweetcorn",
-    ],
-  },
-  "🍗 Non-Vegetarian": {
-    Poultry: ["Chicken Breast", "Chicken Thigh", "Turkey"],
-    "Red Meat": ["Beef", "Lamb", "Pork"],
-    Seafood: ["Salmon", "Tuna", "Shrimp", "Crab"],
-    Eggs: ["Chicken Eggs", "Quail Eggs", "Eggs"],
-  },
-  "🥛 Dairy Products": {
-    Milk: ["Whole Milk", "Skim Milk", "Almond Milk", "Soy Milk", "Oat Milk"],
-    Cheese: ["Cheddar", "Mozzarella", "Parmesan", "Cream Cheese"],
-    Yogurt: ["Plain Yogurt", "Greek Yogurt", "Flavored Yogurt", "Yoghurt"],
-    "Butter & Cream": [
-      "Salted Butter",
-      "Unsalted Butter",
-      "Heavy Cream",
-      "Double Cream",
-    ],
-  },
-  "🧃 Drinks & Beverages": {
-    "Soft Drinks": ["Cola", "Lemonade", "Ginger Ale"],
-    Juices: ["Orange Juice", "Apple Juice", "Mango Juice"],
-    "Tea & Coffee": ["Green Tea", "Black Coffee", "Herbal Tea"],
-    "Alcoholic Beverages": ["Beer", "Wine", "Whiskey"],
-    Water: ["Still Water", "Sparkling Water"],
-  },
-  "🍿 Snacks": {
-    "Chips & Crisps": ["Potato Chips", "Tortilla Chips", "Pita Chips"],
-    "Nuts & Seeds": ["Almonds", "Cashews", "Sunflower Seeds", "Nuts"],
-    Popcorn: ["Butter Popcorn", "Caramel Popcorn"],
-    "Candy & Sweets": ["Chocolate Bars", "Gummies", "Hard Candy", "Caramel"],
-  },
-  "🌿 Greens & Herbs": {
-    "Fresh Herbs": ["Basil", "Cilantro", "Parsley", "Mint"],
-    "Salad Greens": ["Arugula", "Romaine", "Mixed Greens", "Spinach"],
-    Microgreens: ["Pea Shoots", "Radish Sprouts", "Sunflower Sprouts"],
-  },
-  "🧂 Condiments & Essentials": {
-    Sauces: ["Ketchup", "Mustard", "Soy Sauce", "Hot Sauce", "Pesto"],
-    Spices: ["Black Pepper", "Cumin", "Paprika", "Turmeric"],
-    Oils: ["Olive Oil", "Vegetable Oil", "Coconut Oil"],
-    Vinegars: ["Balsamic Vinegar", "Apple Cider Vinegar", "White Vinegar"],
-  },
-  "🌾 Grains & Staples": {
-    Rice: ["White Rice", "Brown Rice", "Basmati Rice", "Quinoa"],
-    Pasta: ["Spaghetti", "Penne", "Fusilli", "Noodles"],
-    Flours: ["All-Purpose Flour", "Whole Wheat Flour", "Almond Flour"],
-    Legumes: ["Lentils", "Chickpeas", "Black Beans"],
-  },
-  "🥐 Bakery & Breakfast Items": {
-    Bread: [
-      "White Bread",
-      "Sourdough",
-      "Whole Grain Bread",
-      "Rye Bread",
-      "Brioche",
-    ],
-    Pastries: ["Croissant", "Danish", "Muffin"],
-    Cereals: ["Oatmeal", "Corn Flakes", "Granola"],
-    "Breakfast Spreads": ["Peanut Butter", "Jam", "Honey", "Maple"],
-  },
-};
 
 // API Configuration
 const BACKEND_URL =
   Platform.OS === "ios"
-    ? "https://fridge-backend-e2qc.onrender.com"
-    : "https://fridge-backend-e2qc.onrender.com";
+    ? "http://192.168.0.215:8001"
+    : "http://192.168.0.215:8001";
 
 // Logger utility
 const logger = {
@@ -184,17 +73,17 @@ class FridgeAPI {
     }
   }
 
-  static async saveToInventory(inventoryItems) {
-    try {
-      const response = await axios.post(`${BACKEND_URL}/inventory/save`, {
-        items: inventoryItems,
-      });
-      return response.data;
-    } catch (error) {
-      logger.error(`Save inventory API error: ${error.message}`);
-      throw error;
-    }
-  }
+  // static async saveToInventory(inventoryItems) {
+  //   try {
+  //     const response = await axios.post(`${BACKEND_URL}/inventory/save`, {
+  //       items: inventoryItems,
+  //     });
+  //     return response.data;
+  //   } catch (error) {
+  //     logger.error(`Save inventory API error: ${error.message}`);
+  //     throw error;
+  //   }
+  // }
 
   static async clearInventory() {
     try {
@@ -280,32 +169,6 @@ export default function RealtimeFridgeScanner() {
         }),
       ])
     ).start();
-  };
-
-  const assignCategoryAndSubcategory = (itemName) => {
-    let parentCategory = "Unknown Category";
-    let subCategory = "Unknown Subcategory";
-    const normalizedItem = itemName.toLowerCase().replace(/[^a-z0-9\s]/g, "");
-
-    for (const [parent, subCats] of Object.entries(subcategories)) {
-      for (const [subCat, items] of Object.entries(subCats)) {
-        if (
-          items.some((subItem) =>
-            normalizedItem.includes(
-              subItem.toLowerCase().replace(/[^a-z0-9\s]/g, "")
-            )
-          ) ||
-          normalizedItem.includes(
-            subCat.toLowerCase().replace(/[^a-z0-9\s]/g, "")
-          )
-        ) {
-          parentCategory = parent;
-          subCategory = subCat;
-          return { parentCategory, subCategory };
-        }
-      }
-    }
-    return { parentCategory, subCategory };
   };
 
   const checkPermissions = async () => {
@@ -466,7 +329,7 @@ export default function RealtimeFridgeScanner() {
       if (Array.isArray(detections)) {
         setDetectedInventory(detections);
         if (detections.length > 0) {
-          await saveToInventory(detections);
+          // await saveToInventory(detections);
           Animated.sequence([
             Animated.timing(fadeAnim, {
               toValue: 0.7,
@@ -533,76 +396,67 @@ export default function RealtimeFridgeScanner() {
     }
   };
 
-  const saveToInventory = async (detections) => {
-    try {
-      const inventoryItems = detections.map((detection) => {
-        const { parentCategory, subCategory } = assignCategoryAndSubcategory(
-          detection.item
-        );
-        return {
-          name: detection.item,
-          count: detection.count || 1,
-          category: parentCategory,
-          subCategory,
-        };
-      });
+  // const saveToInventory = async (detections) => {
+  //   try {
+  //     const inventoryItems = detections.map((detection) => {
+  //       return {
+  //         name: detection.item,
+  //         count: detection.count || 1,
+  //       };
+  //     });
 
-      await FridgeAPI.saveToInventory(inventoryItems);
+  //     await FridgeAPI.saveToInventory(inventoryItems);
 
-      const storedData = await AsyncStorage.getItem("inventory");
-      const existingData = storedData ? JSON.parse(storedData) : [];
-      const newItems = inventoryItems.map((item) => ({
-        item: item.name,
-        quantity: item.count,
-        purchase_date: new Date().toISOString().split("T")[0],
-        weight: "N/A",
-        expiry_date: "N/A",
-        parentCategory: item.category,
-        subCategory: item.subCategory,
-      }));
-      const updatedData = [...existingData, ...newItems];
-      await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
+  //     const storedData = await AsyncStorage.getItem("inventory");
+  //     const existingData = storedData ? JSON.parse(storedData) : [];
+  //     const newItems = inventoryItems.map((item) => ({
+  //       item: item.name,
+  //       quantity: item.count,
+  //       purchase_date: new Date().toISOString().split("T")[0],
+  //       weight: "N/A",
+  //       expiry_date: "N/A",
+  //     }));
+  //     const updatedData = [...existingData, ...newItems];
+  //     await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
 
-      const newInventory = { ...inventory };
-      inventoryItems.forEach((item) => {
-        const itemName = item.name;
-        if (newInventory.items[itemName]) {
-          newInventory.items[itemName].count += item.count;
-        } else {
-          newInventory.items[itemName] = {
-            name: itemName,
-            count: item.count,
-            category: item.category,
-            subCategory: item.subCategory,
-            last_detected: new Date().toISOString(),
-          };
-        }
-      });
+  //     const newInventory = { ...inventory };
+  //     inventoryItems.forEach((item) => {
+  //       const itemName = item.name;
+  //       if (newInventory.items[itemName]) {
+  //         newInventory.items[itemName].count += item.count;
+  //       } else {
+  //         newInventory.items[itemName] = {
+  //           name: itemName,
+  //           count: item.count,
+  //           last_detected: new Date().toISOString(),
+  //         };
+  //       }
+  //     });
 
-      newInventory.total_items = Object.values(newInventory.items).reduce(
-        (sum, item) => sum + item.count,
-        0
-      );
-      newInventory.unique_items = Object.keys(newInventory.items).length;
-      const categories = {};
-      Object.values(newInventory.items).forEach((item) => {
-        if (categories[item.category]) {
-          categories[item.category] += item.count;
-        } else {
-          categories[item.category] = item.count;
-        }
-      });
-      newInventory.categories = categories;
+  //     newInventory.total_items = Object.values(newInventory.items).reduce(
+  //       (sum, item) => sum + item.count,
+  //       0
+  //     );
+  //     newInventory.unique_items = Object.keys(newInventory.items).length;
+  //     const categories = {};
+  //     Object.values(newInventory.items).forEach((item) => {
+  //       if (categories[item.category]) {
+  //         categories[item.category] += item.count;
+  //       } else {
+  //         categories[item.category] = item.count;
+  //       }
+  //     });
+  //     newInventory.categories = categories;
 
-      setInventory(newInventory);
-      logger.info(
-        `Successfully saved ${inventoryItems.length} items to inventory`
-      );
-    } catch (error) {
-      logger.error(`Failed to save inventory: ${error.message}`);
-      Alert.alert("Error", "Failed to save items to inventory");
-    }
-  };
+  //     setInventory(newInventory);
+  //     logger.info(
+  //       `Successfully saved ${inventoryItems.length} items to inventory`
+  //     );
+  //   } catch (error) {
+  //     logger.error(`Failed to save inventory: ${error.message}`);
+  //     Alert.alert("Error", "Failed to save items to inventory");
+  //   }
+  // };
 
   const toggleCamera = () => {
     if (!cameraPermission) {
@@ -748,7 +602,7 @@ export default function RealtimeFridgeScanner() {
           <View style={styles.cameraOverlay}>
             {loadingInventory ? (
               <View style={styles.scanningIndicator}>
-                <ActivityIndicator size="large" color={Colors.white} />
+                <ActivityIndicator size="large" color={Colors.background} />
                 <Text style={styles.scanningText}>Processing Image...</Text>
                 <Text style={styles.scanningSubtext}>
                   This may take up to 45 seconds
@@ -756,7 +610,7 @@ export default function RealtimeFridgeScanner() {
               </View>
             ) : isProcessing ? (
               <View style={styles.scanningIndicator}>
-                <ActivityIndicator size="large" color={Colors.white} />
+                <ActivityIndicator size="large" color={Colors.background} />
                 <Text style={styles.scanningText}>Preparing Image...</Text>
               </View>
             ) : detectedInventory.length > 0 || isUploaded ? (
@@ -921,12 +775,12 @@ const styles = StyleSheet.create({
   scanningText: {
     fontSize: 20,
     fontWeight: "bold",
-    color: Colors.white,
+    color: Colors.background,
     marginBottom: 10,
   },
   scanningSubtext: {
     fontSize: 14,
-    color: Colors.white,
+    color: Colors.background,
     opacity: 0.8,
     marginBottom: 20,
   },
@@ -938,7 +792,7 @@ const styles = StyleSheet.create({
   detectedItem: {
     marginVertical: 5,
     padding: 10,
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     borderRadius: 10,
     width: "80%",
   },
@@ -962,7 +816,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.danger,
   },
   cameraButtonText: {
-    color: Colors.white,
+    color: Colors.background,
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -996,7 +850,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   permissionButtonText: {
-    color: Colors.white,
+    color: Colors.background,
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -1006,7 +860,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   summaryContainer: {
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.background,
     borderRadius: 15,
     padding: 20,
     shadowColor: "#000",

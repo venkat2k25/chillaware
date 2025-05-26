@@ -11,8 +11,10 @@ import {
   FlatList,
   Dimensions,
 } from "react-native";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import FoodImage from '../assets/food.png'
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Picker } from '@react-native-picker/picker';
 import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
 import Ionicons from "@expo/vector-icons/Ionicons";
@@ -37,6 +39,7 @@ export default function CookScreen() {
   const [currentStep, setCurrentStep] = useState("foodType");
   const [selectedFoodType, setSelectedFoodType] = useState(null);
   const [servings, setServings] = useState(2);
+  const [selectedDiet, setSelectedDiet] = useState('vegetarian');
   const [inventoryItems, setInventoryItems] = useState([]);
   const [loading, setLoading] = useState(false);
   const [recipes, setRecipes] = useState([]);
@@ -132,6 +135,7 @@ export default function CookScreen() {
         body: JSON.stringify({
           foodType: selectedFoodType.id,
           servings,
+          selectedDiet,
           inventory: inventoryItems,
         }),
       });
@@ -238,6 +242,22 @@ export default function CookScreen() {
             </TouchableOpacity>
           </View>
 
+{/* Dropdown for Diet Preference */}
+        <View style={styles.dropdownContainer}>
+          <Text style={styles.servingsTitle}>Select Diet Preference</Text>
+          <Picker
+            selectedValue={selectedDiet}
+            onValueChange={(itemValue) => setSelectedDiet(itemValue)}
+            style={styles.picker}
+          >
+            <Picker.Item label="Vegetarian" value="vegetarian" />
+            <Picker.Item label="Pescatarian" value="pescatarian" />
+            <Picker.Item label="Dairy-free" value="dairy-free" />
+            <Picker.Item label="Keto" value="keto" />
+            <Picker.Item label="Gluten-free" value="gluten-free" />
+          </Picker>
+        </View>
+
           <TouchableOpacity
             style={styles.generateButton}
             onPress={handleGenerateRecipes}
@@ -303,6 +323,12 @@ export default function CookScreen() {
                   />
                   <Text style={styles.recipeMetaText}>{servings} servings</Text>
                 </View>
+
+                 <View style={styles.recipeMeta}>
+                  <MaterialCommunityIcons name="food-apple-outline" size={16}
+                    color={Colors.text} />
+                  <Text style={styles.recipeMetaText}>{selectedDiet}</Text>
+                </View>
               </View>
 
               <TouchableOpacity
@@ -357,6 +383,11 @@ export default function CookScreen() {
                     {servings} servings
                   </Text>
                 </View>
+                 <View style={styles.recipeDetailMetaItem}>
+                   <MaterialCommunityIcons name="food-apple-outline" size={18} color="white"/>
+                  <Text style={styles.recipeDetailMetaText}>{selectedDiet}</Text>
+                </View>
+                
               </View>
 
               <View
@@ -817,4 +848,15 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     lineHeight: 24,
   },
+  dropdownContainer: {
+      flexDirection: 'column',
+      justifyContent: 'start',
+      gap: 0
+  },
+  picker: {
+    marginTop: '-70',
+    margin: 0,
+    padding: 0,
+  }
+  
 });
