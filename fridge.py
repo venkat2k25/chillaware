@@ -282,8 +282,7 @@ class FridgeScanner:
         
         actual_food_classes = [
             'banana', 'apple', 'sandwich', 'orange', 'broccoli', 'carrot',
-            'hot dog', 'pizza', 'donut', 'cake', 'bottle', 'wine glass',
-            'cup', 'fork', 'knife', 'spoon', 'bowl'
+            'hot dog', 'pizza', 'donut', 'cake', 'bottle', 'egg', 'yogurt'
         ]
         
         return class_name_lower in actual_food_classes
