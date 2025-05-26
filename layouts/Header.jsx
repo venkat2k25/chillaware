@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
   },
   logoText: {
     color: Colors.text,
-    fontSize: 22,
+    fontSize: 23,
     fontFamily: "Syne-SemiBold",
   },
   icon: {

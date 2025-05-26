@@ -5,14 +5,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-import MainTab from './navigations/MainTab'; 
+import MainTab from './navigations/MainTab';
 import Colors from './utils/Colors';
 import NotificationScreen from './screens/NotificationScreen';
+import InstructionNav from './navigations/InstructionNav';
 
 const Stack = createNativeStackNavigator();
 
 export default function App() {
-
   const [fontsLoaded] = useFonts({
     'Syne-Regular': require('./assets/fonts/Syne-Regular.ttf'),
     'Syne-Bold': require('./assets/fonts/Syne-Bold.ttf'),
@@ -20,13 +20,13 @@ export default function App() {
     'Syne-SemiBold': require('./assets/fonts/Syne-SemiBold.ttf'),
   });
 
+  if (!fontsLoaded) {
+    return null;
+  }
 
   return (
     <SafeAreaProvider>
-      {/* Set status bar color to match app theme */}
       <StatusBar backgroundColor="#131417" style="light" />
-
-      {/* Match SafeAreaView to status bar color */}
       <SafeAreaView style={styles.safeArea} edges={['top']}>
         <View style={styles.container}>
           <NavigationContainer>
@@ -34,10 +34,11 @@ export default function App() {
               screenOptions={{
                 headerShown: false,
                 contentStyle: { backgroundColor: '#131417' },
-              }}>
+              }}
+            >
               <Stack.Screen name="MainTab" component={MainTab} />
               <Stack.Screen name="Notification" component={NotificationScreen} />
-
+              <Stack.Screen name="InstructionNav" component={InstructionNav} />
             </Stack.Navigator>
           </NavigationContainer>
         </View>
