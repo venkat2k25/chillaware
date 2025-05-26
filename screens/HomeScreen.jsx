@@ -22,10 +22,32 @@ const windowWidth = Dimensions.get("window").width;
 export default function HomeScreen() {
   const navigation = useNavigation();
   const [featuredItems] = useState([
-    { id: 1, title: "Recent Scan", description: "Tomato Sauce", image: Stock },
-    { id: 2, title: "Featured Recipe", description: "Spaghetti Bolognese", image: Stock },
-    { id: 3, title: "Stock Item", description: "Olive Oil", image: Stock },
-  ]);
+  {
+    id: 1,
+    title: "Upload Invoice",
+    description: "Add invoices directly to inventory",
+    image: Stock,
+  },
+  {
+    id: 2,
+    title: "Inventory Filter",
+    description: "Filter by category and search items",
+    image: Stock,
+  },
+  {
+    id: 3,
+    title: "Smart Recipe Suggestions",
+    description: "Recipes based on diet, servings, and food type",
+    image: Stock,
+  },
+  {
+    id: 4,
+    title: "Virtual Fridge",
+    description: "View and manage fridge contents with photos",
+    image: Stock,
+  },
+]);
+
 
   return (
     <LinearGradient
@@ -72,8 +94,8 @@ export default function HomeScreen() {
                   transition={1000}
                 />
                 <View style={styles.carouselTextContainer}>
-                  <Text style={styles.carouselItemTitle}>{item.title}</Text>
-                  <Text style={styles.carouselItemDescription}>{item.description}</Text>
+                  <Text style={styles.carouselItemTitle} numberOfLines={1}>{item.title}</Text>
+                  <Text style={styles.carouselItemDescription} numberOfLines={2}>{item.description}</Text>
                 </View>
               </View>
             )}
@@ -89,7 +111,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#131417",
+    backgroundColor: Colors.background,
   },
   content: {
     paddingTop: 80,
@@ -128,37 +150,38 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   text: {
-    color: Colors.secondary,
-    fontSize: 20,
-    fontWeight: "bold",
+    color: Colors.text,
+    fontSize: 16,
     textAlign: "center",
     letterSpacing: 1,
     fontFamily: "Syne-Bold",
   },
   htext: {
-    color: Colors.bg,
-    fontSize: 20,
+    color: Colors.text,
+    fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
     letterSpacing: 1,
     fontFamily: "Syne-ExtraBold",
   },
   carouselContainer: {
-    marginVertical: 20,
+    marginTop: 20,
+    marginBottom: 0,
     alignItems: "center",
   },
   carouselTitle: {
     fontSize: 20,
     fontWeight: "bold",
     color: Colors.secondary,
-    marginBottom: 10,
+    marginBottom: 20,
     fontFamily: "Syne-Bold",
   },
   carouselItem: {
     flexDirection: "row",
     backgroundColor: Colors.background,
     borderRadius: 12,
-    padding: 10,
+    padding: 25,
+    marginHorizontal: 10,
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
@@ -167,18 +190,18 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   carouselImage: {
-    width: 80,
-    height: 80,
+    width: 40,
+    height: 40,
     borderRadius: 10,
-    marginRight: 10,
+    marginRight: 25,
   },
   carouselTextContainer: {
     flex: 1,
   },
   carouselItemTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontWeight: "bold",
-    color: Colors.bg,
+    color: Colors.text,
     fontFamily: "Syne-Bold",
   },
   carouselItemDescription: {

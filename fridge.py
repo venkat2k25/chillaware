@@ -20,10 +20,11 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('fridge_scanner.log'),
+        # logging.FileHandler('fridge_scanner.log'),
         logging.StreamHandler()
     ]
 )
+
 logger = logging.getLogger(__name__)
 
 # Pydantic models for request/response
@@ -437,9 +438,9 @@ async def process_image(file: UploadFile = File(...)):
         logger.error(f"Process image error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Image processing failed: {str(e)}")
 
-@app.post("/scan", response_model=ScanResponse)
-async def scan_image(file: UploadFile = File(...)):
-    return await process_image(file)
+# @app.post("/scan", response_model=ScanResponse)
+# async def scan_image(file: UploadFile = File(...)):
+#     return await process_image(file)
 
 @app.post("/scan/debug")
 async def scan_image_debug(file: UploadFile = File(...)):
@@ -473,27 +474,26 @@ async def scan_image_debug(file: UploadFile = File(...)):
         logger.error(f"Debug scan error: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=f"Debug scan failed: {str(e)}")
 
-@app.post("/scan/camera")
-async def scan_camera():
-    try:
-        mock_detections = [
-            DetectionResult(item="apple", confidence=0.85, count=1, bbox=[10, 10, 50, 50], category="Fruits"),
-            DetectionResult(item="banana", confidence=0.92, count=2, bbox=[70, 20, 40, 60], category="Fruits"),
-            DetectionResult(item="bottle", confidence=0.78, count=1, bbox=[120, 30, 30, 80], category="Beverages"),
-        ]
+# @app.post("/scan/camera")
+# async def scan_camera():
+#     try:
+#         mock_detections = [
+#             DetectionResult(item="apple", confidence=0.85, count=1, bbox=[10, 10, 50, 50], category="Fruits"),
+#             DetectionResult(item="banana", confidence=0.92, count=2, bbox=[70, 20, 40, 60], category="Fruits"),
+#         ]
         
-        total_added = scanner.add_detected_items(mock_detections)
+#         total_added = scanner.add_detected_items(mock_detections)
         
-        return ScanResponse(
-            success=True,
-            detections=mock_detections,
-            total_new_items=total_added,
-            message=f"Camera scan completed, added {total_added} items"
-        )
+#         return ScanResponse(
+#             success=True,
+#             detections=mock_detections,
+#             total_new_items=total_added,
+#             message=f"Camera scan completed, added {total_added} items"
+#         )
         
-    except Exception as e:
-        logger.error(f"Camera scan error: {str(e)}", exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Camera scan failed: {str(e)}")
+#     except Exception as e:
+#         logger.error(f"Camera scan error: {str(e)}", exc_info=True)
+#         raise HTTPException(status_code=500, detail=f"Camera scan failed: {str(e)}")
 
 @app.get("/inventory", response_model=InventoryResponse)
 async def get_inventory():
@@ -601,11 +601,11 @@ async def get_config():
 
 @app.post("/config/threshold")
 async def update_threshold(confidence: float):
-    if 0.1 <= confidence <= 1.0:
+    if 0.3 <= confidence <= 1.0:
         scanner.confidence_threshold = confidence
         return {"success": True, "message": f"Confidence threshold updated to {confidence}"}
     else:
-        raise HTTPException(status_code=400, detail="Confidence must be between 0.1 and 1.0")
+        raise HTTPException(status_code=400, detail="Confidence must be between 0.3 and 1.0")
 
 if __name__ == "__main__":
     import uvicorn
