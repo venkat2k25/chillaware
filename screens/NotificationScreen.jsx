@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CustomHeader from "../layouts/CustomHeader";
 import MessageCard from "../components/MessageCard";
 import Colors from "../utils/Colors";
+import { useFocusEffect } from "@react-navigation/native";
 
 const SENTENCES = [
   "⏳ Hurry up! Only 24 hours left before the {title product} vanishes into the void.",
@@ -21,16 +22,15 @@ const SENTENCES = [
 export default function NotificationScreen() {
   const [inventory, setInventory] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [notifiedIds, setNotifiedIds] = useState([]);
 
   const getTimeAgo = (timestamp) => {
     const now = new Date();
     const time = new Date(timestamp);
-    const diffInSeconds = Math.floor((now - time) / 1000);
-
-    const days = Math.floor(diffInSeconds / (60 * 60 * 24));
-    const hours = Math.floor((diffInSeconds % (60 * 60 * 24)) / (60 * 60));
-    const minutes = Math.floor((diffInSeconds % (60 * 60)) / 60);
-
+    const diff = Math.floor((now - time) / 1000);
+    const days = Math.floor(diff / 86400);
+    const hours = Math.floor((diff % 86400) / 3600);
+    const minutes = Math.floor((diff % 3600) / 60);
     if (days > 5) return "a long time ago";
     if (days > 1) return `${days} days ago`;
     if (days === 1) return "1 day ago";
@@ -39,44 +39,38 @@ export default function NotificationScreen() {
     return "Just now";
   };
 
-  useEffect(() => {
-    const loadInventory = async () => {
-      try {
-        const data = await AsyncStorage.getItem("inventory");
-        if (data) {
-          const parsedData = JSON.parse(data);
-          const formattedData = parsedData.map((item, index) => ({
-            id: index.toString(),
-            productName: item.item || "Unknown Item",
-            expiryDate: item.expiry_date || "N/A",
-            originalIndex: index,
-          }));
-          setInventory(formattedData);
-        }
-      } catch (error) {
-        console.error("Failed to load inventory:", error);
+  const loadInventoryAndMessages = async () => {
+    try {
+      const invData = await AsyncStorage.getItem("inventory");
+      const msgData = await AsyncStorage.getItem("messages");
+      if (invData) {
+        const parsed = JSON.parse(invData);
+        const formatted = parsed.map((item, i) => ({
+          id: i.toString(),
+          productName: item.item || "Unknown",
+          expiryDate: item.expiry_date || "N/A",
+        }));
+        setInventory(formatted);
       }
-    };
-
-    const loadStoredMessages = async () => {
-      try {
-        const data = await AsyncStorage.getItem("messages");
-        if (data) {
-          setMessages(JSON.parse(data));
-        }
-      } catch (error) {
-        console.error("Failed to load messages:", error);
+      if (msgData) {
+        const parsed = JSON.parse(msgData);
+        setMessages(parsed);
+        const ids = parsed.map((m) => m.idRef).filter(Boolean);
+        setNotifiedIds(ids);
       }
-    };
+    } catch (e) {
+      console.error("Loading Error", e);
+    }
+  };
 
-    loadInventory();
-    loadStoredMessages();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadInventoryAndMessages();
+    }, [])
+  );
 
   useEffect(() => {
-    if (inventory.length === 0) return;
-
-    const checkExpiry = async () => {
+    const checkExpiryAndNotify = async () => {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       const tomorrowStr = tomorrow.toISOString().split("T")[0];
@@ -84,46 +78,37 @@ export default function NotificationScreen() {
       const newMessages = [];
 
       for (const item of inventory) {
-        if (item.expiryDate === tomorrowStr) {
-          const randomSentence =
-            SENTENCES[Math.floor(Math.random() * SENTENCES.length)];
-          const messageText = randomSentence.replace(
-            "{title product}",
-            item.productName
-          );
-
+        if (item.expiryDate === tomorrowStr && !notifiedIds.includes(item.id)) {
+          const template = SENTENCES[Math.floor(Math.random() * SENTENCES.length)];
+          const messageText = template.replace("{title product}", item.productName);
           const newMessage = {
             id: Date.now() + Math.random(),
+            idRef: item.id, // To prevent duplicate
             text: messageText,
             time: new Date().toISOString(),
           };
-
           newMessages.push(newMessage);
         }
       }
 
       if (newMessages.length > 0) {
-        const updatedMessages = [...newMessages, ...messages];
-        setMessages(updatedMessages);
-
+        const updated = [...newMessages, ...messages];
+        setMessages(updated);
+        setNotifiedIds((prev) => [...prev, ...newMessages.map((m) => m.idRef)]);
         try {
-          await AsyncStorage.setItem(
-            "messages",
-            JSON.stringify(updatedMessages)
-          );
+          await AsyncStorage.setItem("messages", JSON.stringify(updated));
         } catch (err) {
-          console.error("Failed to store messages:", err);
+          console.error("Failed to store messages", err);
         }
       }
     };
 
-    const interval = setInterval(checkExpiry, 10000); 
-
-    return () => clearInterval(interval);
-  }, [inventory, messages]);
+    if (inventory.length > 0) checkExpiryAndNotify();
+  }, [inventory]);
 
   const handleClearMessages = async () => {
     setMessages([]);
+    setNotifiedIds([]);
     try {
       await AsyncStorage.removeItem("messages");
     } catch (err) {
@@ -133,7 +118,7 @@ export default function NotificationScreen() {
 
   return (
     <View style={styles.container}>
-      <CustomHeader title={"Notifications"} />
+      <CustomHeader title="Notifications" />
       <View style={styles.topBar}>
         <Text style={styles.heading}>Messages</Text>
         {messages.length > 0 && (
@@ -147,11 +132,8 @@ export default function NotificationScreen() {
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {messages.map((item) => (
-          <MessageCard
-            key={item.id}
-            message={{ ...item, time: getTimeAgo(item.time) }}
-          />
+        {messages.map((msg) => (
+          <MessageCard key={msg.id} message={{ ...msg, time: getTimeAgo(msg.time) }} />
         ))}
       </ScrollView>
     </View>

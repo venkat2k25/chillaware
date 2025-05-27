@@ -10,18 +10,19 @@ const Header = () => {
   const [notifications, setNotifications] = useState([]);
 
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const storedData = await AsyncStorage.getItem("messages");
-        const parsedData = storedData ? JSON.parse(storedData) : [];
-        setNotifications(parsedData);
-      } catch (e) {
-        console.log("Failed to load notifications", e);
-      }
-    };
-
-    fetchNotifications();
-  }, []);
+  const fetchNotifications = async () => {
+    try {
+      const storedData = await AsyncStorage.getItem("messages");
+      const parsedData = storedData ? JSON.parse(storedData) : [];
+      setNotifications(parsedData);
+    } catch (e) {
+      console.log("Failed to load notifications", e);
+    }
+  };
+  fetchNotifications();
+  const interval = setInterval(fetchNotifications, 5000); 
+  return () => clearInterval(interval);
+}, []);
 
   return (
     <View style={styles.container}>

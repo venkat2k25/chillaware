@@ -396,7 +396,7 @@ export default function InventoryScreen() {
         playsInSilentModeIOS: true,
       });
     } catch (error) {
-      console.error("Error setting up audio:", error);
+      console.log("Error setting up audio:", error);
     }
   };
 
@@ -437,7 +437,7 @@ export default function InventoryScreen() {
         await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
       }
     } catch (err) {
-      console.error("Failed to load inventory data:", err);
+      console.log("Failed to load inventory data:", err);
     }
   };
 
@@ -493,7 +493,7 @@ export default function InventoryScreen() {
 
       console.log("Recording started successfully");
     } catch (error) {
-      console.error("Failed to start recording:", error);
+      console.log("Failed to start recording:", error);
       setRecordingStates((prev) => ({ ...prev, [itemId]: null }));
       setIsRecording(false);
       setShowRecordingModal(false);
@@ -566,8 +566,8 @@ export default function InventoryScreen() {
       setShowRecordingModal(false);
       setCurrentRecordingItem(null);
     } catch (error) {
-      console.error("❌ Failed to stop recording:", error.message);
-      console.error("🔧 Full error:", error);
+      console.log("❌ Failed to stop recording:", error.message);
+      console.log("🔧 Full error:", error);
 
       if (currentRecordingItem) {
         setRecordingStates((prev) => ({ ...prev, [currentRecordingItem.id]: null }));
@@ -595,7 +595,7 @@ export default function InventoryScreen() {
       setCurrentRecordingItem(null);
       stopAudioLevelSimulation();
     } catch (error) {
-      console.error("Error canceling recording:", error);
+      console.log("Error canceling recording:", error);
     }
   };
 
@@ -664,7 +664,7 @@ export default function InventoryScreen() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ Gemini API error:", errorText);
+        console.log("❌ Gemini API error:", errorText);
         throw new Error(`Gemini API error: ${response.status}`);
       }
 
@@ -687,8 +687,8 @@ export default function InventoryScreen() {
         return null;
       }
     } catch (error) {
-      console.error("❌ Error processing with Gemini:", error.message);
-      console.error("🔧 Full error details:", error);
+      console.log("❌ Error processing with Gemini:", error.message);
+      console.log("🔧 Full error details:", error);
       return null;
     }
   };
@@ -730,7 +730,6 @@ export default function InventoryScreen() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ Deepgram API error response:", errorText);
         console.log("🔄 Trying alternative audio format...");
         return await transcribeAudioAlternative(audioUri);
       }
@@ -753,8 +752,8 @@ export default function InventoryScreen() {
         throw new Error("No transcript found in Deepgram response");
       }
     } catch (error) {
-      console.error("❌ Deepgram transcription error:", error.message);
-      console.error("🔧 Full error:", error);
+      console.log("❌ Deepgram transcription error:", error.message);
+      console.log("🔧 Full error:", error);
       throw new Error(`Failed to transcribe audio: ${error.message}`);
     }
   };
@@ -791,7 +790,7 @@ export default function InventoryScreen() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ Alternative method also failed:", errorText);
+        console.log("❌ Alternative method also failed:", errorText);
         throw new Error(`Alternative transcription failed: ${response.status}`);
       }
 
@@ -806,7 +805,7 @@ export default function InventoryScreen() {
 
       throw new Error("No transcript from alternative method");
     } catch (error) {
-      console.error("❌ Alternative transcription failed:", error);
+      console.log("❌ Alternative transcription failed:", error);
       throw error;
     }
   };
@@ -848,14 +847,14 @@ export default function InventoryScreen() {
 
           console.log("✅ Item update completed successfully");
         } else {
-          console.error("❌ Item not found in storage at index:", itemIndex);
+          console.log("❌ Item not found in storage at index:", itemIndex);
         }
       } else {
-        console.error("❌ No inventory data found in storage");
+        console.log("❌ No inventory data found in storage");
       }
     } catch (error) {
-      console.error("❌ Failed to update expiry date:", error.message);
-      console.error("🔧 Full error:", error);
+      console.log("❌ Failed to update expiry date:", error.message);
+      console.log("🔧 Full error:", error);
     }
   };
 
@@ -891,7 +890,7 @@ export default function InventoryScreen() {
         },
       ]);
     } catch (err) {
-      console.error("Failed to delete item:", err);
+      console.log("Failed to delete item:", err);
     }
   };
 
@@ -1070,6 +1069,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: Colors.text,
+    textTransform: 'uppercase',
     textAlign: "left",
     marginBottom: 8,
   },
