@@ -5,7 +5,6 @@ export const FOOD_ICONS = {
   carrot: "🥕",
   broccoli: "🥦",
   potato: "🥔",
-  bottle: "🍼",
   cup: "☕",
   sandwich: "🥪",
   pizza: "🍕",
@@ -14,8 +13,5 @@ export const FOOD_ICONS = {
   bowl: "🍜",
   wine_glass: "🍷",
   hot_dog: "🌭",
-  spoon: "🥄",
-  knife: "🔪",
-  fork: "🍴",
   default: "🥘",
 };

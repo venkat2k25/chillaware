@@ -142,44 +142,49 @@ export default function ScanScreen() {
       setIsUploaded(false);
     }
   };
+const saveToInventory = async (inventoryToSave) => {
+  if (!inventoryToSave || !Array.isArray(inventoryToSave) || inventoryToSave.length === 0) {
+    Alert.alert("No items to save", "There are no valid items to add to your inventory.");
+    setPhoto(null);
+    setIsUploaded(false);
+    setInventory(null);
+    return;
+  }
 
-  const saveToInventory = async (inventoryToSave) => {
-    if (!inventoryToSave || inventoryToSave.length === 0) {
-      Alert.alert("No items to save", "There are no extracted items to add to your inventory.");
-      setPhoto(null);
-      setIsUploaded(false);
-      setInventory(null);
-      return;
+  try {
+    const existingData = await AsyncStorage.getItem("inventory");
+    let inventoryData = existingData ? JSON.parse(existingData) : [];
+
+    // Ensure inventoryData is an array
+    if (!Array.isArray(inventoryData)) {
+      inventoryData = [];
     }
-    try {
-      const existingData = await AsyncStorage.getItem("inventory");
-      let inventoryData = existingData ? JSON.parse(existingData) : [];
-      const itemsToSave = inventoryToSave.map((item) => {
-        return {
-          item: item.item,
-          quantity: item.quantity || 1,
-          weight: item.weight || "",
-          purchase_date: item.purchase_date || new Date().toISOString().split("T")[0],
-          expiry_date: item.expiry_date || "",
-        };
-      });
-      inventoryData = [...inventoryData, ...itemsToSave];
-      await AsyncStorage.setItem("inventory", JSON.stringify(inventoryData));
-      Alert.alert("Success", `${itemsToSave.length} item(s) added to inventory successfully`);
-      setPhoto(null);
-      setIsUploaded(false);
-      setInventory(null);
-      setTimeout(() => {
-        navigation.navigate("Inventory");
-      }, 1000);
-    } catch (error) {
-      console.error("Error saving to inventory:", error);
-      Alert.alert("Error", "Failed to save items to inventory");
-      setPhoto(null);
-      setIsUploaded(false);
-      setInventory(null);
-    }
-  };
+
+    const itemsToSave = inventoryToSave.map((item) => ({
+      item: item.item,
+      quantity: item.quantity || 1,
+      weight: item.weight || "",
+      purchase_date: item.purchase_date || new Date().toISOString().split("T")[0],
+      expiry_date: item.expiry_date || "",
+    }));
+
+    inventoryData = [...inventoryData, ...itemsToSave];
+    await AsyncStorage.setItem("inventory", JSON.stringify(inventoryData));
+    Alert.alert("Success", `${itemsToSave.length} item(s) added to inventory successfully`);
+    setPhoto(null);
+    setIsUploaded(false);
+    setInventory(null);
+    setTimeout(() => {
+      navigation.navigate("Inventory");
+    }, 1000);
+  } catch (error) {
+    console.error("Error saving to inventory:", error);
+    Alert.alert("Error", "Failed to save items to inventory");
+    setPhoto(null);
+    setIsUploaded(false);
+    setInventory(null);
+  }
+};
 
   return (
     <View style={styles.container}>

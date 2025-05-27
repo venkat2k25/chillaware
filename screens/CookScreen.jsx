@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   servingsValue: {
     fontSize: 28,
     fontWeight: "600",
-    color: Colors.bg,
+    color: Colors.text,
     marginHorizontal: 24,
   },
   generateButton: {

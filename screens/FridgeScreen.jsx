@@ -10,17 +10,15 @@ import {
   ActivityIndicator,
   Platform,
   PermissionsAndroid,
+  Image, // For displaying captured image
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
-import Header from "../layouts/Header";
+import Header from "../layouts/Header"; // Adjust path as needed
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Entypo } from "@expo/vector-icons";
-import Colors from "../utils/Colors";
-import { FOOD_ICONS } from "../json/foods";
-
-
-// Food item icons mapping
+import { Entypo, MaterialIcons } from "@expo/vector-icons"; // Added MaterialIcons for delete icon
+import Colors from "../utils/Colors"; // Adjust path as needed
+import { FOOD_ICONS } from "../json/foods"; // Adjust path as needed
 
 // API Configuration
 const BACKEND_URL =
@@ -36,6 +34,7 @@ const logger = {
     console.log(`[INFO] ${new Date().toISOString()}: ${message}`),
 };
 
+// FridgeAPI class
 class FridgeAPI {
   static async processImage(imageData) {
     try {
@@ -127,7 +126,19 @@ class FridgeAPI {
   }
 }
 
+// Helper function to format date
+const formatDate = (dateString) => {
+  if (!dateString) return "N/A";
+  const date = new Date(dateString);
+  return date.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
+
 export default function RealtimeFridgeScanner() {
+  // State declarations
   const [inventory, setInventory] = useState({
     items: {},
     total_items: 0,
@@ -139,13 +150,14 @@ export default function RealtimeFridgeScanner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [loadingInventory, setLoadingInventory] = useState(false);
   const [apiStatus, setApiStatus] = useState("checking");
-  const [cameraActive, setCameraActive] = useState(false);
+  const [cameraActive, setCameraActive] = useState(false); // Ensure cameraActive is defined
   const [photo, setPhoto] = useState(null);
   const [isUploaded, setIsUploaded] = useState(false);
   const [detectedInventory, setDetectedInventory] = useState([]);
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
+  // useEffect for initialization
   useEffect(() => {
     checkPermissions();
     checkApiHealth();
@@ -329,7 +341,6 @@ export default function RealtimeFridgeScanner() {
       if (Array.isArray(detections)) {
         setDetectedInventory(detections);
         if (detections.length > 0) {
-          // Save detected items to inventory and reload inventory
           setLoadingInventory(true);
           await saveToInventory(detections);
           await loadInventory();
@@ -400,69 +411,68 @@ export default function RealtimeFridgeScanner() {
     }
   };
 
- const saveToInventory = async (detections) => {
-   try {
-     const inventoryItems = detections.map((detection) => {
-       return {
-         name: detection.item,
-         count: detection.count || 1,
-         category: detection.category || "Other",
-         confidence: detection.confidence || 0.5,
-       };
-     });
+  const saveToInventory = async (detections) => {
+    try {
+      const inventoryItems = detections.map((detection) => ({
+        name: detection.item,
+        count: detection.count || 1,
+        category: detection.category || "Other",
+        confidence: detection.confidence || 0.5,
+      }));
 
-     await FridgeAPI.saveToInventory(inventoryItems);
+      await FridgeAPI.saveToInventory(inventoryItems);
 
-     const storedData = await AsyncStorage.getItem("inventory");
-     const existingData = storedData ? JSON.parse(storedData) : [];
-     const newItems = inventoryItems.map((item) => ({
-       item: item.name,
-       quantity: item.count,
-       purchase_date: new Date().toISOString().split("T")[0],
-       weight: "N/A",
-       expiry_date: "N/A",
-     }));
-     const updatedData = [...existingData, ...newItems];
-     await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
+      const storedData = await AsyncStorage.getItem("inventory");
+      const existingData = storedData ? JSON.parse(storedData) : [];
+      const newItems = inventoryItems.map((item) => ({
+        item: item.name,
+        quantity: item.count,
+        purchase_date: new Date().toISOString().split("T")[0],
+        weight: "N/A",
+        expiry_date: "N/A",
+      }));
+      const updatedData = [...existingData, ...newItems];
+      await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
 
-     const newInventory = { ...inventory };
-     inventoryItems.forEach((item) => {
-       const itemName = item.name;
-       if (newInventory.items[itemName]) {
-         newInventory.items[itemName].count += item.count;
-       } else {
-         newInventory.items[itemName] = {
-           name: itemName,
-           count: item.count,
-           last_detected: new Date().toISOString(),
-         };
-       }
-     });
+      const newInventory = { ...inventory };
+      inventoryItems.forEach((item) => {
+        const itemName = item.name;
+        if (newInventory.items[itemName]) {
+          newInventory.items[itemName].count += item.count;
+        } else {
+          newInventory.items[itemName] = {
+            name: itemName,
+            count: item.count,
+            last_detected: new Date().toISOString(),
+            category: item.category,
+          };
+        }
+      });
 
-     newInventory.total_items = Object.values(newInventory.items).reduce(
-       (sum, item) => sum + item.count,
-       0
-     );
-     newInventory.unique_items = Object.keys(newInventory.items).length;
-     const categories = {};
-     Object.values(newInventory.items).forEach((item) => {
-       if (categories[item.category]) {
-         categories[item.category] += item.count;
-       } else {
-         categories[item.category] = item.count;
-       }
-     });
-     newInventory.categories = categories;
+      newInventory.total_items = Object.values(newInventory.items).reduce(
+        (sum, item) => sum + item.count,
+        0
+      );
+      newInventory.unique_items = Object.keys(newInventory.items).length;
+      const categories = {};
+      Object.values(newInventory.items).forEach((item) => {
+        if (categories[item.category]) {
+          categories[item.category] += item.count;
+        } else {
+          categories[item.category] = item.count;
+        }
+      });
+      newInventory.categories = categories;
 
-     setInventory(newInventory);
-     logger.info(
-       `Successfully saved ${inventoryItems.length} items to inventory`
-     );
-   } catch (error) {
-     logger.error(`Failed to save inventory: ${error.message}`);
-     Alert.alert("Error", "Failed to save items to inventory");
-   }
- };
+      setInventory(newInventory);
+      logger.info(
+        `Successfully saved ${inventoryItems.length} items to inventory`
+      );
+    } catch (error) {
+      logger.error(`Failed to save inventory: ${error.message}`);
+      Alert.alert("Error", "Failed to save items to inventory");
+    }
+  };
 
   const toggleCamera = () => {
     if (!cameraPermission) {
@@ -476,7 +486,7 @@ export default function RealtimeFridgeScanner() {
       Alert.alert("API Offline", "Backend server is not available.");
       return;
     }
-    setCameraActive(!cameraActive);
+    setCameraActive(!cameraActive); // Toggle cameraActive state
     setPhoto(null);
     setIsUploaded(false);
     setDetectedInventory([]);
@@ -581,25 +591,6 @@ export default function RealtimeFridgeScanner() {
     );
   }
 
-  const createGrid = () => {
-    const items = Object.entries(inventory.items);
-    const grid = Array(8)
-      .fill()
-      .map(() => Array(5).fill(null));
-    let itemIndex = 0;
-
-    for (let row = 0; row < 8; row++) {
-      for (let col = 0; col < 5; col++) {
-        if (itemIndex < items.length) {
-          grid[row][col] = items[itemIndex];
-          itemIndex++;
-        }
-      }
-    }
-
-    return grid;
-  };
-
   return (
     <View style={styles.container}>
       <Header />
@@ -703,6 +694,26 @@ export default function RealtimeFridgeScanner() {
                 </Text>
               </View>
             </View>
+            {/* Display captured image if available */}
+            {photo && isUploaded && (
+              <View style={styles.capturedImageContainer}>
+                <Image
+                  source={{ uri: photo.uri }}
+                  style={styles.capturedImage}
+                  resizeMode="contain"
+                />
+                <TouchableOpacity
+                  style={styles.clearImageButton}
+                  onPress={() => {
+                    setPhoto(null);
+                    setIsUploaded(false);
+                    setDetectedInventory([]);
+                  }}
+                >
+                  <Text style={styles.clearImageButtonText}>Clear Image</Text>
+                </TouchableOpacity>
+              </View>
+            )}
             {Object.keys(inventory.items).length === 0 ? (
               <View style={styles.emptyState}>
                 <Text style={styles.emptyIcon}>🥡</Text>
@@ -712,28 +723,34 @@ export default function RealtimeFridgeScanner() {
                 </Text>
               </View>
             ) : (
-              <View style={styles.gridContainer}>
-                {createGrid().map((row, rowIndex) => (
-                  <View key={rowIndex} style={styles.row}>
-                    {row.map((item, colIndex) =>
-                      item ? (
-                        <View key={item[0]} style={styles.fridgeBox}>
-                          <Text style={styles.summaryIcon}>
-                            {FOOD_ICONS[item[0].toLowerCase()] ||
-                              FOOD_ICONS.default}
-                          </Text>
-                          {/* <Text style={styles.itemText}>{item[0]}</Text> */}
-                          <View style={styles.countBadge}>
-                            <Text style={styles.itemCount}>{item[1].count}</Text>
-                          </View>
-                        </View>
-                      ) : (
-                        <View key={`empty-${rowIndex}-${colIndex}`} style={styles.fridgeBox}>
-                          {/* <Text style={styles.summaryIcon}>🧊</Text>
-                          <Text style={styles.itemText}>Empty</Text> */}
-                        </View>
-                      )
-                    )}
+              <View style={styles.cardContainer}>
+                {Object.entries(inventory.items).map(([itemName, itemData]) => (
+                  <View key={itemName} style={styles.card}>
+                    <View style={styles.cardImageContainer}>
+                      <Text style={styles.cardImage}>
+                        {FOOD_ICONS[itemName.toLowerCase()] ||
+                          FOOD_ICONS.default}
+                      </Text>
+                    </View>
+                    <View style={styles.cardContent}>
+                      <Text style={styles.cardTitle}>{itemName}</Text>
+                      <Text style={styles.cardSubtitle}>
+                        Quantity: {itemData.count}
+                      </Text>
+                      <Text style={styles.cardSubtitle}>
+                        Last Taken: {formatDate(itemData.last_detected)}
+                      </Text>
+                    </View>
+                    <TouchableOpacity
+                      style={styles.deleteButton}
+                      onPress={() => removeItemFromInventory(itemName, 1)}
+                    >
+                      <MaterialIcons
+                        name="delete"
+                        size={24}
+                        color={Colors.danger}
+                      />
+                    </TouchableOpacity>
                   </View>
                 ))}
               </View>
@@ -932,46 +949,68 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 10,
   },
-  gridContainer: {
-    marginTop: 10,
-  },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 15,
-  },
-  fridgeBox: {
-    width: "18%", 
-    aspectRatio: 1,
-    borderRadius: 15,
+  capturedImageContainer: {
     alignItems: "center",
-    justifyContent: "center",
-    position: "relative",
-    backgroundColor: Colors.lightGray,
+    marginBottom: 20,
   },
-  summaryIcon: {
-    fontSize: 36,
+  capturedImage: {
+    width: "100%",
+    height: 200,
+    borderRadius: 10,
+    marginBottom: 10,
   },
-  // itemText: {
-  //   fontSize: 12,
-  //   fontWeight: "500",
-  //   marginTop: 5,
-  //   textAlign: "center",
-  // },
-  countBadge: {
-    position: "absolute",
-    top: 5,
-    right: 5,
-    backgroundColor: Colors.text,
-    borderRadius: 50,
-    padding: 5,
-    minWidth: 22,
-    alignItems: "center",
-    justifyContent: "center",
+  clearImageButton: {
+    backgroundColor: Colors.danger,
+    paddingHorizontal: 15,
+    paddingVertical: 8,
+    borderRadius: 8,
   },
-  itemCount: {
+  clearImageButtonText: {
     color: Colors.background,
-    fontSize: 12,
-    fontWeight: "500",
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  cardContainer: {
+    flexDirection: "column",
+    gap: 10,
+  },
+  card: {
+    flexDirection: "row",
+    borderRadius: 10,
+    padding: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+    marginBottom: 10,
+  },
+  cardImageContainer: {
+    width: 60,
+    height: 60,
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 10,
+  },
+  cardImage: {
+    fontSize: 40,
+  },
+  cardContent: {
+    flex: 1,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: "600",
+    color: Colors.text,
+    textTransform: "uppercase",
+  },
+  cardSubtitle: {
+    fontSize: 14,
+    color: Colors.text,
+    opacity: 0.7,
+  },
+  deleteButton: {
+    padding: 10,
   },
 });

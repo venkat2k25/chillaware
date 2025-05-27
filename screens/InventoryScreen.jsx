@@ -219,9 +219,43 @@ const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
     year: 'numeric',
   });
 
-  const match = foodItem.find((food) =>
-    item.productName.toLowerCase().includes(food.name.toLowerCase())
-  );
+  // const match = foodItem.find((food) =>
+  //   item.productName.toLowerCase().includes(food.name.toLowerCase())
+  // );
+
+  const getMatchingFood = (productName, foodItems) => {
+  const name = productName.toLowerCase();
+
+  // 1. Exact full match
+  let match = foodItems.find(food => name === food.name.toLowerCase());
+  if (match) return match;
+
+  // Helper function to check substring match of n letters
+  const checkSubstringMatch = (length) => {
+    return foodItems.find(food => {
+      const foodName = food.name.toLowerCase();
+      for (let i = 0; i <= name.length - length; i++) {
+        const sub = name.substring(i, i + length);
+        if (foodName.includes(sub)) return true;
+      }
+      return false;
+    });
+  };
+
+  // 2. 5-letter substring match
+  match = checkSubstringMatch(5);
+  if (match) return match;
+  // 3. 4-letter substring match
+  match = checkSubstringMatch(4);
+  if (match) return match;
+  // 4. 3-letter substring match
+  match = checkSubstringMatch(3);
+  if (match) return match;
+  // 5. No match found
+  return null;
+};
+
+const match = getMatchingFood(item.productName, foodItem);
 
   return (
     <View style={styles.productCard}>

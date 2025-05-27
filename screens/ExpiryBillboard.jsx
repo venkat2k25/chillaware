@@ -27,17 +27,41 @@ import { foodItem } from "../json/foodItems";
 const windowWidth = Dimensions.get("window").width;
 
 
-const getImageForProduct = (productName) => {
+const getImageForProduct = (productName, foodItems) => {
   if (!productName) return null;
-  
-  const normalized = productName.trim().toLowerCase();
 
-  const matchedItem = foodItem.find((item) => {
-    const regex = new RegExp(item.name.replace(/\s+/g, "\\s*"), "i"); 
-    return regex.test(normalized);
-  });
+  const name = productName.toLowerCase();
 
-  return matchedItem ? matchedItem.link : null;
+  // 1. Exact match
+  let match = foodItems.find(food => name === food.name.toLowerCase());
+  if (match) return match.link;
+
+  // Helper for n-letter substring matching
+  const checkSubstringMatch = (length) => {
+    return foodItems.find(food => {
+      const foodName = food.name.toLowerCase();
+      for (let i = 0; i <= name.length - length; i++) {
+        const sub = name.substring(i, i + length);
+        if (foodName.includes(sub)) return true;
+      }
+      return false;
+    });
+  };
+
+  // 2. 5-letter match
+  match = checkSubstringMatch(5);
+  if (match) return match.link;
+
+  // 3. 4-letter match
+  match = checkSubstringMatch(4);
+  if (match) return match.link;
+
+  // 4. 3-letter match
+  match = checkSubstringMatch(3);
+  if (match) return match.link;
+
+  // 5. No match
+  return null;
 };
 
 const StockItem = ({
@@ -84,7 +108,7 @@ const StockItem = ({
         <View style={styles.imageContainer}>
           <Image
             style={styles.billboardImage}
-            source={{ uri: getImageForProduct(item.productName) || defaultFallbackImage }}
+            source={{ uri: getImageForProduct(item.productName, foodItem) || defaultFallbackImage }}
             contentFit="cover"
             transition={1000}
           />
@@ -286,17 +310,17 @@ const [usedItems, setUsedItems] = useState({});
           />
         ))}
       </ScrollView>
-      {showConfetti &&
+        {showConfetti &&
         sortedItems.some(
           (item) => item.daysUntilExpiry !== undefined && item.daysUntilExpiry <= 7
         ) && (
           <ConfettiCannon
             count={50}
-            origin={{ x: windowWidth * 0.35, y: 0 }}
-            autoStart
-            fadeOut
+            origin={{ x: windowWidth / 2, y: 0 }}
+            fallSpeed={3000}
+            fadeOut={true}
           />
-        )}
+      )}
     </Animated.View>
   );
 };
@@ -357,8 +381,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   billboardImage: {
-    width: 'auto',
-    height: 120,
+    width: 200,
+    height: 180,
     borderRadius: 12,
   },
   billboardItemName: {
