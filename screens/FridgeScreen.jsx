@@ -10,13 +10,13 @@ import {
   ActivityIndicator,
   Platform,
   PermissionsAndroid,
-  Image, // For displaying captured image
+  Image,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import Header from "../layouts/Header"; // Adjust path as needed
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Entypo, MaterialIcons } from "@expo/vector-icons"; // Added MaterialIcons for delete icon
+import { Entypo, MaterialIcons } from "@expo/vector-icons";
 import Colors from "../utils/Colors"; // Adjust path as needed
 import { FOOD_ICONS } from "../json/foods"; // Adjust path as needed
 
@@ -150,7 +150,7 @@ export default function RealtimeFridgeScanner() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [loadingInventory, setLoadingInventory] = useState(false);
   const [apiStatus, setApiStatus] = useState("checking");
-  const [cameraActive, setCameraActive] = useState(false); // Ensure cameraActive is defined
+  const [cameraActive, setCameraActive] = useState(false);
   const [photo, setPhoto] = useState(null);
   const [isUploaded, setIsUploaded] = useState(false);
   const [detectedInventory, setDetectedInventory] = useState([]);
@@ -163,6 +163,19 @@ export default function RealtimeFridgeScanner() {
     checkApiHealth();
     loadInventory();
     startPulseAnimation();
+    // Load last image from AsyncStorage
+    const loadLastImage = async () => {
+      try {
+        const storedImageUri = await AsyncStorage.getItem("lastImage");
+        if (storedImageUri) {
+          setPhoto({ uri: storedImageUri });
+          setIsUploaded(true);
+        }
+      } catch (error) {
+        logger.error(`Failed to load last image: ${error.message}`);
+      }
+    };
+    loadLastImage();
     return () => Animated.timing(pulseAnim).stop();
   }, []);
 
@@ -345,6 +358,8 @@ export default function RealtimeFridgeScanner() {
           await saveToInventory(detections);
           await loadInventory();
           setLoadingInventory(false);
+          // Store the image URI in AsyncStorage
+          await AsyncStorage.setItem("lastImage", image.uri);
           Animated.sequence([
             Animated.timing(fadeAnim, {
               toValue: 0.7,
@@ -371,6 +386,7 @@ export default function RealtimeFridgeScanner() {
           );
           setPhoto(null);
           setIsUploaded(false);
+          await AsyncStorage.removeItem("lastImage");
         }
       } else {
         logger.error(
@@ -383,6 +399,7 @@ export default function RealtimeFridgeScanner() {
         );
         setPhoto(null);
         setIsUploaded(false);
+        await AsyncStorage.removeItem("lastImage");
       }
     } catch (err) {
       setLoadingInventory(false);
@@ -406,6 +423,7 @@ export default function RealtimeFridgeScanner() {
       Alert.alert("Upload Failed", errorMessage);
       setDetectedInventory([]);
       setPhoto(null);
+      await AsyncStorage.removeItem("lastImage");
     } finally {
       setIsProcessing(false);
     }
@@ -486,10 +504,13 @@ export default function RealtimeFridgeScanner() {
       Alert.alert("API Offline", "Backend server is not available.");
       return;
     }
-    setCameraActive(!cameraActive); // Toggle cameraActive state
+    setCameraActive(!cameraActive);
     setPhoto(null);
     setIsUploaded(false);
     setDetectedInventory([]);
+    AsyncStorage.removeItem("lastImage").catch((error) =>
+      logger.error(`Failed to clear last image on toggle: ${error.message}`)
+    );
   };
 
   const clearFridge = () => {
@@ -508,6 +529,7 @@ export default function RealtimeFridgeScanner() {
             });
             await FridgeAPI.clearInventory();
             await AsyncStorage.setItem("inventory", JSON.stringify([]));
+            await AsyncStorage.removeItem("lastImage");
             Alert.alert("Success", "Fridge cleared successfully!");
           } catch (error) {
             logger.error(`Failed to clear inventory: ${error.message}`);
@@ -630,10 +652,15 @@ export default function RealtimeFridgeScanner() {
                 <View style={styles.cameraControls}>
                   <TouchableOpacity
                     style={styles.cameraButton}
-                    onPress={() => {
+                    onPress={async () => {
                       setPhoto(null);
                       setIsUploaded(false);
                       setDetectedInventory([]);
+                      try {
+                        await AsyncStorage.removeItem("lastImage");
+                      } catch (error) {
+                        logger.error(`Failed to clear last image: ${error.message}`);
+                      }
                     }}
                   >
                     <Text style={styles.cameraButtonText}>🔄 Scan Again</Text>
@@ -694,7 +721,6 @@ export default function RealtimeFridgeScanner() {
                 </Text>
               </View>
             </View>
-            {/* Display captured image if available */}
             {photo && isUploaded && (
               <View style={styles.capturedImageContainer}>
                 <Image
@@ -704,10 +730,15 @@ export default function RealtimeFridgeScanner() {
                 />
                 <TouchableOpacity
                   style={styles.clearImageButton}
-                  onPress={() => {
+                  onPress={async () => {
                     setPhoto(null);
                     setIsUploaded(false);
                     setDetectedInventory([]);
+                    try {
+                      await AsyncStorage.removeItem("lastImage");
+                    } catch (error) {
+                      logger.error(`Failed to clear last image: ${error.message}`);
+                    }
                   }}
                 >
                   <Text style={styles.clearImageButtonText}>Clear Image</Text>
