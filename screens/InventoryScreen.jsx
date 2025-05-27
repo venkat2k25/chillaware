@@ -425,7 +425,7 @@ export default function InventoryScreen() {
         await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
       }
     } catch (err) {
-      console.error("Failed to load inventory data:", err);
+      console.log("Failed to load inventory data:", err);
     }
   };
 
@@ -453,7 +453,7 @@ export default function InventoryScreen() {
       startAudioLevelSimulation();
       console.log("Recording started successfully");
     } catch (error) {
-      console.error("Failed to start recording:", error);
+      console.log("Failed to start recording:", error);
       setRecordingStates((prev) => ({ ...prev, [itemId]: null }));
       setIsRecording(false);
       setShowRecordingModal(false); // Ensure modal is hidden on error
@@ -619,7 +619,7 @@ export default function InventoryScreen() {
       console.log("🤖 Gemini response status:", response.status);
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ Gemini API error:", errorText);
+        console.log("❌ Gemini API error:", errorText);
         throw new Error(`Gemini API error: ${response.status}`);
       }
 
@@ -678,7 +678,6 @@ export default function InventoryScreen() {
       console.log("📡 Deepgram response status:", response.status);
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ Deepgram API error response:", errorText);
         console.log("🔄 Trying alternative audio format...");
         return await transcribeAudioAlternative(audioUri);
       }
@@ -728,7 +727,7 @@ export default function InventoryScreen() {
       console.log("📡 Alternative response status:", response.status);
       if (!response.ok) {
         const errorText = await response.text();
-        console.error("❌ Alternative method also failed:", errorText);
+        console.log("❌ Alternative method also failed:", errorText);
         throw new Error(`Alternative transcription failed: ${response.status}`);
       }
 
@@ -743,7 +742,7 @@ export default function InventoryScreen() {
 
       throw new Error("No transcript from alternative method");
     } catch (error) {
-      console.error("❌ Alternative transcription failed:", error);
+      console.log("❌ Alternative transcription failed:", error);
       throw error;
     }
   };
@@ -804,7 +803,7 @@ export default function InventoryScreen() {
         },
       ]);
     } catch (err) {
-      console.error("Failed to delete item:", err);
+      console.log("Failed to delete item:", err);
     }
   };
 
@@ -977,6 +976,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: "600",
     color: Colors.text,
+    textTransform: 'uppercase',
     textAlign: "left",
     marginBottom: 8,
   },

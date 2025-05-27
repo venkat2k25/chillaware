@@ -14,9 +14,8 @@ from typing import Dict, List, Optional
 from pydantic import BaseModel
 import asyncio
 from contextlib import asynccontextmanager
-import aiofiles  # For asynchronous file operations
 
-# Configure logging to file and console
+# Configure logging to console only
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
@@ -76,7 +75,6 @@ class FridgeScanner:
         self.nms_threshold = float(os.getenv("NMS_THRESHOLD", "0.4"))
         self.detection_cooldown = {}
         self.cooldown_duration = float(os.getenv("COOLDOWN_DURATION", "2.0"))
-        self.inventory_file = os.getenv("INVENTORY_FILE", "inventory.json")
         
         self.food_categories = {
             'apple': 'Fruits', 'banana': 'Fruits', 'orange': 'Fruits', 
@@ -103,7 +101,6 @@ class FridgeScanner:
         }
         
         self.setup_detection_model()
-        self.load_inventory()
 
     def setup_detection_model(self):
         model_files = {
@@ -309,31 +306,13 @@ class FridgeScanner:
                 del self.fridge_items[item_name]
             return True
         return False
-    
-    async def save_inventory(self):
-        async with aiofiles.open(self.inventory_file, 'w') as f:
-            await f.write(json.dumps(self.fridge_items, default=str))
-    
-    async def load_inventory(self):
-        if os.path.exists(self.inventory_file):
-            async with aiofiles.open(self.inventory_file, 'r') as f:
-                data = await f.read()
-                loaded_items = json.loads(data)
-                self.fridge_items = defaultdict(lambda: {
-                    'count': 0,
-                    'category': 'Other',
-                    'last_detected': None,
-                    'confidence': 0.0
-                }, {k: v for k, v in loaded_items.items()})
-    
+
 # Global scanner instance
 scanner = FridgeScanner()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await scanner.load_inventory()
     yield
-    await scanner.save_inventory()
 
 app = FastAPI(
     title="Smart Fridge Scanner API",
@@ -360,8 +339,7 @@ async def root():
     }
 
 @app.post("/process_image", response_model=ScanResponse)
-async def process_image(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
-
+async def process_image(file: UploadFile = File(...)):
     try:
         contents = await file.read()
         nparr = np.frombuffer(contents, np.uint8)
@@ -372,9 +350,6 @@ async def process_image(background_tasks: BackgroundTasks, file: UploadFile = Fi
         detections = await scanner.detect_objects_async(frame)
         total_added = scanner.add_detected_items(detections)
 
-        # Save inventory in the background to avoid blocking the response
-        background_tasks.add_task(scanner.save_inventory)
-
         return ScanResponse(
             success=True,
             detections=detections,
@@ -384,7 +359,6 @@ async def process_image(background_tasks: BackgroundTasks, file: UploadFile = Fi
     except Exception as e:
         logger.exception("Failed to process image")
         raise HTTPException(status_code=500, detail=f"Image processing failed: {str(e)}")
-
 
 @app.get("/inventory", response_model=InventoryResponse)
 async def get_inventory():
@@ -424,7 +398,6 @@ async def save_inventory(request: SaveInventoryRequest):
                 'confidence': confidence,
                 'timestamp': datetime.datetime.now().isoformat()
             })
-        await scanner.save_inventory()
         return {
             "success": True,
             "message": f"Saved {total_added} items to inventory",
@@ -440,7 +413,6 @@ async def save_inventory(request: SaveInventoryRequest):
 async def clear_inventory():
     try:
         scanner.clear_inventory()
-        await scanner.save_inventory()
         return {"success": True, "message": "Inventory cleared"}
     except Exception as e:
         logger.error(f"Failed to clear inventory: {str(e)}", exc_info=True)
@@ -451,7 +423,6 @@ async def remove_item(item_name: str, count: int = 1):
     try:
         success = scanner.remove_item(item_name, count)
         if success:
-            await scanner.save_inventory()
             return {"success": True, "message": f"Removed {count} {item_name}(s)"}
         else:
             raise HTTPException(status_code=404, detail="Item not found or insufficient quantity")

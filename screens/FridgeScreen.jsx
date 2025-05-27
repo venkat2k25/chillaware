@@ -728,7 +728,7 @@ export default function RealtimeFridgeScanner() {
                   style={styles.capturedImage}
                   resizeMode="contain"
                 />
-                <TouchableOpacity
+                {/* <TouchableOpacity
                   style={styles.clearImageButton}
                   onPress={async () => {
                     setPhoto(null);
@@ -742,7 +742,7 @@ export default function RealtimeFridgeScanner() {
                   }}
                 >
                   <Text style={styles.clearImageButtonText}>Clear Image</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
             )}
             {Object.keys(inventory.items).length === 0 ? (
@@ -778,8 +778,8 @@ export default function RealtimeFridgeScanner() {
                     >
                       <MaterialIcons
                         name="delete"
-                        size={24}
-                        color={Colors.danger}
+                        size={20}
+                        color={Colors.text}
                       />
                     </TouchableOpacity>
                   </View>
@@ -917,11 +917,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.background,
     borderRadius: 15,
     padding: 20,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
   },
   summaryHeader: {
     flexDirection: "row",
@@ -986,21 +981,21 @@ const styles = StyleSheet.create({
   },
   capturedImage: {
     width: "100%",
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 10,
+    height: 300,
+    borderRadius: 30,
+    marginVertical: 10,
   },
-  clearImageButton: {
-    backgroundColor: Colors.danger,
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  clearImageButtonText: {
-    color: Colors.background,
-    fontSize: 14,
-    fontWeight: "bold",
-  },
+  // clearImageButton: {
+  //   backgroundColor: Colors.text,
+  //   paddingHorizontal: 0,
+  //   paddingVertical: 0,
+  //   borderRadius: 8,
+  // },
+  // clearImageButtonText: {
+  //   color: Colors.background,
+  //   fontSize: 14,
+  //   fontWeight: "bold",
+  // },
   cardContainer: {
     flexDirection: "column",
     gap: 10,
@@ -1010,11 +1005,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 10,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
+    backgroundColor: Colors.bg + '50',
     marginBottom: 10,
   },
   cardImageContainer: {
