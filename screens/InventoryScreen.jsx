@@ -17,7 +17,7 @@ import {
 import placeholderImage from '../assets/empty.jpg';
 import Svg, { Path, Line } from "react-native-svg";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Audio } from "expo-av";
+import { AudioModule, useAudioRecorder, RecordingPresets } from "expo-audio";
 import * as FileSystem from "expo-file-system";
 import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
@@ -88,7 +88,7 @@ const VoiceWave = ({ isRecording, audioLevels }) => {
   );
 };
 
-// RecordingCard Component (unchanged)
+// RecordingCard Component (added debug logging)
 const RecordingCard = ({
   visible,
   onClose,
@@ -102,6 +102,7 @@ const RecordingCard = ({
   const pulseAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    console.log("RecordingCard: visible =", visible); // Debug log
     if (visible) {
       Animated.timing(slideAnim, {
         toValue: 20,
@@ -145,7 +146,10 @@ const RecordingCard = ({
     }
   }, [isRecording]);
 
-  if (!visible) return null;
+  if (!visible) {
+    console.log("RecordingCard: Not rendering due to visible=false");
+    return null;
+  }
 
   return (
     <Animated.View
@@ -210,7 +214,7 @@ const RecordingCard = ({
   );
 };
 
-// ProductCard Component (modified to show category and subcategory)
+// ProductCard Component (unchanged)
 const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
   const date = new Date(item.purchaseDate);
   const formattedDate = date.toLocaleDateString('default', {
@@ -219,43 +223,32 @@ const ProductCard = ({ item, onMicPress, onDeletePress, recordingState }) => {
     year: 'numeric',
   });
 
-  // const match = foodItem.find((food) =>
-  //   item.productName.toLowerCase().includes(food.name.toLowerCase())
-  // );
-
   const getMatchingFood = (productName, foodItems) => {
-  const name = productName.toLowerCase();
+    const name = productName.toLowerCase();
+    let match = foodItems.find(food => name === food.name.toLowerCase());
+    if (match) return match;
 
-  // 1. Exact full match
-  let match = foodItems.find(food => name === food.name.toLowerCase());
-  if (match) return match;
+    const checkSubstringMatch = (length) => {
+      return foodItems.find(food => {
+        const foodName = food.name.toLowerCase();
+        for (let i = 0; i <= name.length - length; i++) {
+          const sub = name.substring(i, i + length);
+          if (foodName.includes(sub)) return true;
+        }
+        return false;
+      });
+    };
 
-  // Helper function to check substring match of n letters
-  const checkSubstringMatch = (length) => {
-    return foodItems.find(food => {
-      const foodName = food.name.toLowerCase();
-      for (let i = 0; i <= name.length - length; i++) {
-        const sub = name.substring(i, i + length);
-        if (foodName.includes(sub)) return true;
-      }
-      return false;
-    });
+    match = checkSubstringMatch(5);
+    if (match) return match;
+    match = checkSubstringMatch(4);
+    if (match) return match;
+    match = checkSubstringMatch(3);
+    if (match) return match;
+    return null;
   };
 
-  // 2. 5-letter substring match
-  match = checkSubstringMatch(5);
-  if (match) return match;
-  // 3. 4-letter substring match
-  match = checkSubstringMatch(4);
-  if (match) return match;
-  // 4. 3-letter substring match
-  match = checkSubstringMatch(3);
-  if (match) return match;
-  // 5. No match found
-  return null;
-};
-
-const match = getMatchingFood(item.productName, foodItem);
+  const match = getMatchingFood(item.productName, foodItem);
 
   return (
     <View style={styles.productCard}>
@@ -268,11 +261,6 @@ const match = getMatchingFood(item.productName, foodItem);
         <Text style={styles.productName} numberOfLines={2}>
           {item.productName} ({item.quantity})
         </Text>
-        {/* {item.parentCategory && (
-          <Text style={styles.productDetail}>
-            📂 {item.parentCategory} {item.subCategory ? `> ${item.subCategory}` : ''}
-          </Text>
-        )} */}
         {item.weight !== "N/A" && (
           <Text style={styles.productDetail}>📟 {item.weight}</Text>
         )}
@@ -327,12 +315,19 @@ export default function InventoryScreen() {
   const [inventoryData, setInventoryData] = useState([]);
   const [isRecording, setIsRecording] = useState(false);
   const [recordingStates, setRecordingStates] = useState({});
-  const [recording, setRecording] = useState(null);
-  const [showRecordingModal, setShowRecordingModal] = useState(false);
   const [currentRecordingItem, setCurrentRecordingItem] = useState(null);
   const [audioLevels, setAudioLevels] = useState(Array(20).fill(0.1));
+  const [showRecordingModal, setShowRecordingModal] = useState(false); // Ensure state is defined
   const audioLevelInterval = useRef(null);
   const numColumns = 1;
+
+  // Initialize audio recorder with high-quality preset
+  const audioRecorder = useAudioRecorder(RecordingPresets.HIGH_QUALITY, (status) => {
+    if (status.metering !== undefined) {
+      const normalizedLevel = Math.max(0, Math.min(1, (status.metering + 60) / 60));
+      updateAudioLevels(normalizedLevel);
+    }
+  });
 
   // State for category filters
   const [selected, setSelected] = useState([]);
@@ -356,7 +351,6 @@ export default function InventoryScreen() {
     
     for (const [parentCategory, subCats] of Object.entries(subcategories)) {
       for (const [subCategory, items] of Object.entries(subCats)) {
-        // Create a regex pattern for each item in the subcategory
         for (const item of items) {
           const regex = new RegExp(`\\b${item.toLowerCase()}\\b`, 'i');
           if (regex.test(lowerProductName)) {
@@ -366,9 +360,7 @@ export default function InventoryScreen() {
       }
     }
     
-    // Fallback for items not found in subcategories
     for (const [parentCategory, subCats] of Object.entries(subcategories)) {
-      // Check if product name partially matches category name
       if (lowerProductName.includes(parentCategory.replace(/[^a-zA-Z ]/g, '').toLowerCase())) {
         return { parentCategory, subCategory: 'Other' };
       }
@@ -390,23 +382,21 @@ export default function InventoryScreen() {
 
   const setupAudio = async () => {
     try {
-      await Audio.requestPermissionsAsync();
-      await Audio.setAudioModeAsync({
-        allowsRecordingIOS: true,
-        playsInSilentModeIOS: true,
-      });
+      const status = await AudioModule.requestRecordingPermissionsAsync();
+      if (!status.granted) {
+        Alert.alert("Permission Denied", "Please grant microphone access to record audio.");
+      }
     } catch (error) {
       console.error("Error setting up audio:", error);
+      Alert.alert("Error", "Failed to set up audio permissions.");
     }
   };
 
   const loadInventoryData = async () => {
     try {
-      // await AsyncStorage.removeItem("inventory");
       const data = await AsyncStorage.getItem("inventory");
       if (data) {
         const parsedData = JSON.parse(data);
-        console.log("Loaded inventory:", parsedData);
         const formattedData = parsedData.map((item, index) => {
           const { parentCategory, subCategory } = assignCategoryAndSubcategory(item.item || "Unknown Item");
           return {
@@ -423,8 +413,6 @@ export default function InventoryScreen() {
         });
 
         setInventoryData(formattedData);
-
-        // Update AsyncStorage with assigned categories
         const updatedData = formattedData.map((item) => ({
           item: item.productName,
           quantity: item.quantity,
@@ -443,60 +431,33 @@ export default function InventoryScreen() {
 
   const startRecording = async (itemId) => {
     try {
-      if (recording) {
-        await recording.stopAndUnloadAsync();
-      }
-
       console.log("Starting recording for item:", itemId);
       const item = inventoryData.find((item) => item.id === itemId);
+      if (!item) {
+        throw new Error("Item not found");
+      }
       setCurrentRecordingItem(item);
-      setShowRecordingModal(true);
+      setShowRecordingModal(true); // Set modal visibility
+      console.log("showRecordingModal set to true"); // Debug log
       setRecordingStates((prev) => ({ ...prev, [itemId]: "recording" }));
       setIsRecording(true);
 
-      const { recording: newRecording } = await Audio.Recording.createAsync({
-        android: {
-          extension: ".wav",
-          outputFormat: Audio.RECORDING_OPTION_ANDROID_OUTPUT_FORMAT_DEFAULT,
-          audioEncoder: Audio.RECORDING_OPTION_ANDROID_AUDIO_ENCODER_DEFAULT,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-          bitRate: 128000,
-        },
-        ios: {
-          extension: ".wav",
-          outputFormat: Audio.RECORDING_OPTION_IOS_OUTPUT_FORMAT_LINEARPCM,
-          audioQuality: Audio.RECORDING_OPTION_IOS_AUDIO_QUALITY_HIGH,
-          sampleRate: 16000,
-          numberOfChannels: 1,
-          bitRate: 128000,
-          linearPCMBitDepth: 16,
-          linearPCMIsBigEndian: false,
-          linearPCMIsFloat: false,
-        },
+      await audioRecorder.prepareToRecordAsync({
+        ...RecordingPresets.HIGH_QUALITY,
+        extension: '.wav',
+        sampleRate: 16000,
+        numberOfChannels: 1,
+        bitRate: 128000,
       });
-
-      newRecording.setOnRecordingStatusUpdate((status) => {
-        if (status.metering !== undefined) {
-          const normalizedLevel = Math.max(
-            0,
-            Math.min(1, (status.metering + 60) / 60)
-          );
-          updateAudioLevels(normalizedLevel);
-        }
-      });
-
-      await newRecording.startAsync();
-      setRecording(newRecording);
-
+      audioRecorder.record();
       startAudioLevelSimulation();
-
       console.log("Recording started successfully");
     } catch (error) {
       console.error("Failed to start recording:", error);
       setRecordingStates((prev) => ({ ...prev, [itemId]: null }));
       setIsRecording(false);
-      setShowRecordingModal(false);
+      setShowRecordingModal(false); // Ensure modal is hidden on error
+      console.log("showRecordingModal set to false due to error"); // Debug log
       Alert.alert("Error", "Failed to start recording. Please check microphone permissions.");
     }
   };
@@ -529,29 +490,29 @@ export default function InventoryScreen() {
   const stopRecording = async () => {
     try {
       console.log("🛑 Stopping recording...");
-
-      if (!recording || !currentRecordingItem) {
-        console.log("❌ No recording or item found");
+      if (!currentRecordingItem) {
+        console.log("❌ No item found");
         return;
       }
 
       const itemId = currentRecordingItem.id;
-      console.log("📦 Processing item:", itemId, currentRecordingItem.productName);
-
       setRecordingStates((prev) => ({ ...prev, [itemId]: "processing" }));
       setIsRecording(false);
       stopAudioLevelSimulation();
 
-      await recording.stopAndUnloadAsync();
-      const uri = recording.getURI();
+      await audioRecorder.stop();
+      const uri = audioRecorder.uri;
       console.log("🎵 Audio saved to:", uri);
+
+      if (!uri) {
+        throw new Error("No recording URI available");
+      }
 
       const expiryDate = await processAudioWithGemini(uri);
 
       if (expiryDate) {
         console.log("✅ SUCCESS! Updating item with expiry date:", expiryDate);
         await updateItemExpiryDate(itemId, expiryDate);
-        console.log("💾 Item updated in storage");
         Alert.alert("Success! 🎉", `Expiry date updated to: ${expiryDate}`);
       } else {
         console.log("❌ FAILED: Could not extract expiry date");
@@ -561,19 +522,18 @@ export default function InventoryScreen() {
         );
       }
 
-      setRecording(null);
       setRecordingStates((prev) => ({ ...prev, [itemId]: null }));
-      setShowRecordingModal(false);
+      setShowRecordingModal(false); // Hide modal
+      console.log("showRecordingModal set to false after stop"); // Debug log
       setCurrentRecordingItem(null);
     } catch (error) {
       console.error("❌ Failed to stop recording:", error.message);
-      console.error("🔧 Full error:", error);
-
       if (currentRecordingItem) {
         setRecordingStates((prev) => ({ ...prev, [currentRecordingItem.id]: null }));
       }
       setIsRecording(false);
-      setShowRecordingModal(false);
+      setShowRecordingModal(false); // Ensure modal is hidden on error
+      console.log("showRecordingModal set to false due to error"); // Debug log
       stopAudioLevelSimulation();
       Alert.alert("Error 😞", "Failed to process recording. Please try again.");
     }
@@ -581,28 +541,25 @@ export default function InventoryScreen() {
 
   const cancelRecording = async () => {
     try {
-      if (recording) {
-        await recording.stopAndUnloadAsync();
-        setRecording(null);
-      }
-
+      await audioRecorder.stop();
       if (currentRecordingItem) {
         setRecordingStates((prev) => ({ ...prev, [currentRecordingItem.id]: null }));
       }
-
       setIsRecording(false);
-      setShowRecordingModal(false);
+      setShowRecordingModal(false); // Hide modal
+      console.log("showRecordingModal set to false on cancel"); // Debug log
       setCurrentRecordingItem(null);
       stopAudioLevelSimulation();
     } catch (error) {
       console.error("Error canceling recording:", error);
+      setShowRecordingModal(false); // Ensure modal is hidden on error
+      console.log("showRecordingModal set to false due to cancel error"); // Debug log
     }
   };
 
   const processAudioWithGemini = async (audioUri) => {
     try {
       console.log("🤖 Starting Gemini processing...");
-
       const transcribedText = await transcribeAudio(audioUri);
       console.log("🗣️ USER SAID:", `"${transcribedText}"`);
 
@@ -637,7 +594,6 @@ export default function InventoryScreen() {
       `;
 
       console.log("📤 Sending to Gemini API...");
-
       const response = await fetch(GEMINI_API_URL, {
         method: "POST",
         headers: {
@@ -661,7 +617,6 @@ export default function InventoryScreen() {
       });
 
       console.log("🤖 Gemini response status:", response.status);
-
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ Gemini API error:", errorText);
@@ -669,8 +624,6 @@ export default function InventoryScreen() {
       }
 
       const data = await response.json();
-      console.log("📋 Full Gemini response:", JSON.stringify(data, null, 2));
-
       const extractedDate =
         data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
       console.log("📅 GEMINI EXTRACTED DATE:", `"${extractedDate}"`);
@@ -688,7 +641,6 @@ export default function InventoryScreen() {
       }
     } catch (error) {
       console.error("❌ Error processing with Gemini:", error.message);
-      console.error("🔧 Full error details:", error);
       return null;
     }
   };
@@ -696,7 +648,6 @@ export default function InventoryScreen() {
   const transcribeAudio = async (audioUri) => {
     try {
       console.log("🎙️ Starting transcription for:", audioUri);
-
       const fileInfo = await FileSystem.getInfoAsync(audioUri);
       console.log("📁 File info:", fileInfo);
 
@@ -712,7 +663,6 @@ export default function InventoryScreen() {
       });
 
       console.log("📤 Sending request to Deepgram...");
-
       const response = await fetch(
         `${DEEPGRAM_URL}?punctuate=true&language=en-US&model=nova-2&smart_format=true&diarize=false`,
         {
@@ -726,8 +676,6 @@ export default function InventoryScreen() {
       );
 
       console.log("📡 Deepgram response status:", response.status);
-      console.log("📡 Deepgram response headers:", response.headers);
-
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ Deepgram API error response:", errorText);
@@ -736,8 +684,6 @@ export default function InventoryScreen() {
       }
 
       const result = await response.json();
-      console.log("📝 Full Deepgram result:", JSON.stringify(result, null, 2));
-
       const transcript =
         result.results?.channels?.[0]?.alternatives?.[0]?.transcript;
 
@@ -746,15 +692,10 @@ export default function InventoryScreen() {
         return transcript.trim();
       } else {
         console.log("⚠️ No transcript found in response");
-        console.log(
-          "🔍 Available channels:",
-          result.results?.channels?.length || 0
-        );
         throw new Error("No transcript found in Deepgram response");
       }
     } catch (error) {
       console.error("❌ Deepgram transcription error:", error.message);
-      console.error("🔧 Full error:", error);
       throw new Error(`Failed to transcribe audio: ${error.message}`);
     }
   };
@@ -762,12 +703,9 @@ export default function InventoryScreen() {
   const transcribeAudioAlternative = async (audioUri) => {
     try {
       console.log("🔄 Trying base64 approach...");
-
       const audioBase64 = await FileSystem.readAsStringAsync(audioUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
-
-      console.log("📊 Audio data size:", audioBase64.length, "characters");
 
       const binaryString = atob(audioBase64);
       const bytes = new Uint8Array(binaryString.length);
@@ -788,7 +726,6 @@ export default function InventoryScreen() {
       );
 
       console.log("📡 Alternative response status:", response.status);
-
       if (!response.ok) {
         const errorText = await response.text();
         console.error("❌ Alternative method also failed:", errorText);
@@ -813,55 +750,31 @@ export default function InventoryScreen() {
 
   const updateItemExpiryDate = async (itemId, expiryDate) => {
     try {
-      console.log(
-        "💾 Updating storage for item:",
-        itemId,
-        "with date:",
-        expiryDate
-      );
-
       const data = await AsyncStorage.getItem("inventory");
       if (data) {
         const parsedData = JSON.parse(data);
-        console.log("📋 Current inventory data:", parsedData.length, "items");
-
         const itemIndex = inventoryData.find(
           (item) => item.id === itemId
         )?.originalIndex;
-        console.log("🔍 Found item at index:", itemIndex);
 
         if (itemIndex !== undefined && parsedData[itemIndex]) {
-          console.log("📝 Before update:", parsedData[itemIndex]);
           parsedData[itemIndex].expiry_date = expiryDate;
-          console.log("📝 After update:", parsedData[itemIndex]);
-
           await AsyncStorage.setItem("inventory", JSON.stringify(parsedData));
-          console.log("💾 Saved to AsyncStorage");
-
           setInventoryData((prev) => {
             const updated = prev.map((item) =>
               item.id === itemId ? { ...item, expiryDate } : item
             );
-            console.log("🔄 Updated local state");
             return updated;
           });
-
-          console.log("✅ Item update completed successfully");
-        } else {
-          console.error("❌ Item not found in storage at index:", itemIndex);
         }
-      } else {
-        console.error("❌ No inventory data found in storage");
       }
     } catch (error) {
-      console.error("❌ Failed to update expiry date:", error.message);
-      console.error("🔧 Full error:", error);
+      console.error("Failed to update expiry date:", error);
     }
   };
 
   const handleMicPress = async (itemId) => {
     const currentState = recordingStates[itemId];
-
     if (!currentState) {
       await startRecording(itemId);
     }
@@ -903,18 +816,13 @@ export default function InventoryScreen() {
     );
   };
 
-  // Filter inventory data based on search query and selected categories
   const filteredData = inventoryData.filter((item) => {
     const matchesSearch = item.productName
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
-
-    // If no categories are selected, show all items that match the search query
     if (selected.length === 0) {
       return matchesSearch;
     }
-
-    // Check if the item's parentCategory is in the selected categories
     const matchesCategory = selected.includes(item.parentCategory);
     return matchesSearch && matchesCategory;
   });
@@ -931,7 +839,6 @@ export default function InventoryScreen() {
   return (
     <View style={styles.container}>
       <Header />
-
       <ScrollView
         style={styles.content}
         contentContainerStyle={{ paddingBottom: 100 }}

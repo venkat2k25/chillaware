@@ -26,7 +26,6 @@ import { foodItem } from "../json/foodItems";
 
 const windowWidth = Dimensions.get("window").width;
 
-
 const getImageForProduct = (productName, foodItems) => {
   if (!productName) return null;
 
@@ -71,7 +70,7 @@ const StockItem = ({
   scaleValues,
   onPress,
   onPressIn,
-   used,
+  used,
   onUse,
 }) => {
   const animatedStyle = useAnimatedStyle(() => ({
@@ -117,18 +116,17 @@ const StockItem = ({
         <Text style={styles.billboardItemDetails}>
           {item.quantity || 1} {item.quantity > 1 ? "items" : "item"}
         </Text>
-     {(item.daysUntilExpiry === 0 || (item.daysUntilExpiry > 0 && item.daysUntilExpiry <= 7)) && (
-  <Text style={styles.billboardItemExpiry}>
-    {item.daysUntilExpiry === 0
-      ? "Expires Today"
-      : `Expires in ${item.daysUntilExpiry} day${item.daysUntilExpiry > 1 ? 's' : ''}`}
-  </Text>
-)}
-
+        {(item.daysUntilExpiry === 0 || (item.daysUntilExpiry > 0 && item.daysUntilExpiry <= 7)) && (
+          <Text style={styles.billboardItemExpiry}>
+            {item.daysUntilExpiry === 0
+              ? "Expires Today"
+              : `Expires in ${item.daysUntilExpiry} day${item.daysUntilExpiry > 1 ? 's' : ''}`}
+          </Text>
+        )}
         <TouchableOpacity
           style={styles.billboardButton}
           onPressIn={onPressIn}
-           onPress={() => {
+          onPress={() => {
             if (!used) onUse(item.id);
           }}
           disabled={used}
@@ -146,7 +144,7 @@ const ExpiryBillboard = ({ navigation }) => {
   const scrollX = useSharedValue(0);
   const scaleValues = useSharedValue({});
   const [inventory, setInventory] = useState([]);
-const [usedItems, setUsedItems] = useState({});
+  const [usedItems, setUsedItems] = useState({});
 
   const handleUse = (id) => {
     setUsedItems((prev) => ({ ...prev, [id]: true }));
@@ -199,16 +197,15 @@ const [usedItems, setUsedItems] = useState({});
 
   // Sort and filter inventory based on daysUntilExpiry and filter
   const sortedItems = useMemo(() => {
-  return inventory
-    .filter(item => item.daysUntilExpiry !== undefined)  // exclude items with no expiry date
-    .sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry)
-    .filter((item) => {
-      if (filter === "urgent") return item.daysUntilExpiry <= 7;
-      if (filter === "soon") return item.daysUntilExpiry <= 30;
-      return true;
-    });
-}, [filter, inventory]);
-
+    return inventory
+      .filter(item => item.daysUntilExpiry !== undefined) // Exclude items with no expiry date
+      .sort((a, b) => a.daysUntilExpiry - b.daysUntilExpiry)
+      .filter((item) => {
+        if (filter === "urgent") return item.daysUntilExpiry <= 7;
+        if (filter === "soon") return item.daysUntilExpiry <= 30;
+        return true;
+      });
+  }, [filter, inventory]);
 
   // Initialize scale values and animate urgent items
   useEffect(() => {
@@ -257,6 +254,11 @@ const [usedItems, setUsedItems] = useState({});
     }
   }, []);
 
+  // If there are no items with expiry dates, don't render the billboard
+  if (sortedItems.length === 0) {
+    return null; // or return <View /> if you prefer an empty view
+  }
+
   return (
     <Animated.View
       entering={FadeInUp.delay(600).duration(600)}
@@ -264,22 +266,6 @@ const [usedItems, setUsedItems] = useState({});
     >
       <View style={styles.filterContainer}>
         <Text style={styles.billboardTitle}>Expiring Soon</Text>
-        {/* Uncomment if you want filter buttons */}
-        {/* <View style={styles.filterButtons}>
-          {["All", "Urgent", "Soon"].map((option) => (
-            <TouchableOpacity
-              key={option}
-              style={[
-                styles.filterButton,
-                filter.toLowerCase() === option.toLowerCase() &&
-                  styles.filterButtonActive,
-              ]}
-              onPress={() => setFilter(option.toLowerCase())}
-            >
-              <Text style={styles.filterButtonText}>{option}</Text>
-            </TouchableOpacity>
-          ))}
-        </View> */}
       </View>
       <ScrollView
         horizontal
@@ -310,7 +296,7 @@ const [usedItems, setUsedItems] = useState({});
           />
         ))}
       </ScrollView>
-        {showConfetti &&
+      {showConfetti &&
         sortedItems.some(
           (item) => item.daysUntilExpiry !== undefined && item.daysUntilExpiry <= 7
         ) && (
@@ -320,7 +306,7 @@ const [usedItems, setUsedItems] = useState({});
             fallSpeed={3000}
             fadeOut={true}
           />
-      )}
+        )}
     </Animated.View>
   );
 };
