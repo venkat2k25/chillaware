@@ -23,8 +23,8 @@ import { FOOD_ICONS } from "../json/foods"; // Adjust path as needed
 // API Configuration
 const BACKEND_URL =
   Platform.OS === "ios"
-    ? "http://192.168.0.215:8001"
-    : "http://192.168.0.215:8001";
+    ? "https://fridge-backend-u75g.onrender.com"
+    : "https://fridge-backend-u75g.onrender.com";
 
 // Logger utility
 const logger = {
@@ -44,15 +44,15 @@ class FridgeAPI {
         type: "image/jpeg",
         name: `photo_${Date.now()}.jpg`,
       });
-
       const response = await axios.post(
         `${BACKEND_URL}/process_image`,
         formData,
         {
           headers: { "Content-Type": "multipart/form-data" },
-          timeout: 45000,
+          timeout: 60000, // Increased timeout for Render cold starts
         }
       );
+      logger.info(`Process image response: ${JSON.stringify(response.data)}`);
       return response.data;
     } catch (error) {
       logger.error(`Image processing API error: ${error.message}`);
@@ -65,7 +65,9 @@ class FridgeAPI {
       const response = await fetch(`${BACKEND_URL}/inventory`);
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
-      return await response.json();
+      const data = await response.json();
+      logger.info(`Get inventory response: ${JSON.stringify(data)}`);
+      return data;
     } catch (error) {
       logger.error(`Get inventory API error: ${error.message}`);
       throw error;
@@ -74,9 +76,10 @@ class FridgeAPI {
 
   static async saveToInventory(inventoryItems) {
     try {
-      const response = await axios.post(`${BACKEND_URL}/inventory/save`, {
+      const response = await axios.post(`${BACKEND_URL}/save_inventory`, {
         items: inventoryItems,
       });
+      logger.info(`Save inventory response: ${JSON.stringify(response.data)}`);
       return response.data;
     } catch (error) {
       logger.error(`Save inventory API error: ${error.message}`);
@@ -86,8 +89,8 @@ class FridgeAPI {
 
   static async clearInventory() {
     try {
-      const response = await fetch(`${BACKEND_URL}/inventory`, {
-        method: "DELETE",
+      const response = await fetch(`${BACKEND_URL}/reset`, {
+        method: "POST",
       });
       if (!response.ok)
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -138,7 +141,6 @@ const formatDate = (dateString) => {
 };
 
 export default function RealtimeFridgeScanner() {
-  // State declarations
   const [inventory, setInventory] = useState({
     items: {},
     total_items: 0,
@@ -157,13 +159,11 @@ export default function RealtimeFridgeScanner() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
 
-  // useEffect for initialization
   useEffect(() => {
     checkPermissions();
     checkApiHealth();
     loadInventory();
     startPulseAnimation();
-    // Load last image from AsyncStorage
     const loadLastImage = async () => {
       try {
         const storedImageUri = await AsyncStorage.getItem("lastImage");
@@ -234,10 +234,13 @@ export default function RealtimeFridgeScanner() {
 
   const loadInventory = async () => {
     try {
+      setLoadingInventory(true);
       const inventoryData = await FridgeAPI.getInventory();
       setInventory(inventoryData);
+      setLoadingInventory(false);
     } catch (error) {
       logger.error(`Failed to load inventory: ${error.message}`);
+      setLoadingInventory(false);
     }
   };
 
@@ -344,13 +347,13 @@ export default function RealtimeFridgeScanner() {
         data,
         {
           headers: { "Content-Type": "multipart/form-data" },
-          timeout: 45000,
+          timeout: 60000,
         }
       );
-
       setLoadingInventory(false);
       setIsUploaded(true);
       const detections = backendRes.data?.detections || [];
+      logger.info(`Detected items: ${JSON.stringify(detections)}`);
       if (Array.isArray(detections)) {
         setDetectedInventory(detections);
         if (detections.length > 0) {
@@ -358,7 +361,6 @@ export default function RealtimeFridgeScanner() {
           await saveToInventory(detections);
           await loadInventory();
           setLoadingInventory(false);
-          // Store the image URI in AsyncStorage
           await AsyncStorage.setItem("lastImage", image.uri);
           Animated.sequence([
             Animated.timing(fadeAnim, {
@@ -420,6 +422,7 @@ export default function RealtimeFridgeScanner() {
       } else {
         errorMessage = `Request Error: ${err.message}`;
       }
+      logger.error(`Upload error: ${errorMessage}`);
       Alert.alert("Upload Failed", errorMessage);
       setDetectedInventory([]);
       setPhoto(null);
@@ -436,37 +439,48 @@ export default function RealtimeFridgeScanner() {
         count: detection.count || 1,
         category: detection.category || "Other",
         confidence: detection.confidence || 0.5,
+        expiry_days: detection.expiry_days || null,
+        storage_location: detection.storage_location || "main_compartment",
       }));
-
       await FridgeAPI.saveToInventory(inventoryItems);
-
       const storedData = await AsyncStorage.getItem("inventory");
       const existingData = storedData ? JSON.parse(storedData) : [];
       const newItems = inventoryItems.map((item) => ({
         item: item.name,
         quantity: item.count,
         purchase_date: new Date().toISOString().split("T")[0],
-        weight: "N/A",
-        expiry_date: "N/A",
+        expiry_date: item.expiry_days
+          ? new Date(Date.now() + item.expiry_days * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0]
+          : "N/A",
+        storage_location: item.storage_location,
       }));
       const updatedData = [...existingData, ...newItems];
       await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
-
       const newInventory = { ...inventory };
       inventoryItems.forEach((item) => {
         const itemName = item.name;
         if (newInventory.items[itemName]) {
           newInventory.items[itemName].count += item.count;
+          newInventory.items[itemName].last_detected = new Date().toISOString();
+          newInventory.items[itemName].expiry_date = item.expiry_days
+            ? new Date(Date.now() + item.expiry_days * 24 * 60 * 60 * 1000).toISOString()
+            : newInventory.items[itemName].expiry_date;
+          newInventory.items[itemName].storage_location = item.storage_location;
         } else {
           newInventory.items[itemName] = {
             name: itemName,
             count: item.count,
             last_detected: new Date().toISOString(),
             category: item.category,
+            expiry_date: item.expiry_days
+              ? new Date(Date.now() + item.expiry_days * 24 * 60 * 60 * 1000).toISOString()
+              : null,
+            storage_location: item.storage_location,
           };
         }
       });
-
       newInventory.total_items = Object.values(newInventory.items).reduce(
         (sum, item) => sum + item.count,
         0
@@ -481,7 +495,6 @@ export default function RealtimeFridgeScanner() {
         }
       });
       newInventory.categories = categories;
-
       setInventory(newInventory);
       logger.info(
         `Successfully saved ${inventoryItems.length} items to inventory`
@@ -548,7 +561,6 @@ export default function RealtimeFridgeScanner() {
         if (newInventory.items[itemName].count <= 0) {
           delete newInventory.items[itemName];
         }
-
         newInventory.total_items = Object.values(newInventory.items).reduce(
           (sum, item) => sum + item.count,
           0
@@ -563,16 +575,18 @@ export default function RealtimeFridgeScanner() {
           }
         });
         newInventory.categories = categories;
-
         setInventory(newInventory);
         await FridgeAPI.removeItem(itemName, count);
-
         const storedData = await AsyncStorage.getItem("inventory");
         if (storedData) {
           const parsedData = JSON.parse(storedData);
-          const updatedData = parsedData.filter(
-            (item) => item.item !== itemName || item.quantity > count
-          );
+          const updatedData = parsedData.map((item) => {
+            if (item.item === itemName) {
+              const newQuantity = item.quantity - count;
+              return { ...item, quantity: newQuantity > 0 ? newQuantity : 0 };
+            }
+            return item;
+          }).filter((item) => item.quantity > 0);
           await AsyncStorage.setItem("inventory", JSON.stringify(updatedData));
         }
       }
@@ -624,7 +638,7 @@ export default function RealtimeFridgeScanner() {
                 <ActivityIndicator size="large" color={Colors.background} />
                 <Text style={styles.scanningText}>Processing Image...</Text>
                 <Text style={styles.scanningSubtext}>
-                  This may take up to 45 seconds
+                  This may take up to 60 seconds
                 </Text>
               </View>
             ) : isProcessing ? (
@@ -641,8 +655,7 @@ export default function RealtimeFridgeScanner() {
                       <Text style={styles.detectedItemText}>
                         {FOOD_ICONS[item.item.toLowerCase()] ||
                           FOOD_ICONS.default}{" "}
-                        {item.item} (x{item.count},{" "}
-                        {Math.round(item.confidence * 100)}%, {item.category})
+                        {item.item} (x{item.count}, {Math.round(item.confidence * 100)}%, {item.category})
                       </Text>
                     </View>
                   ))
@@ -728,21 +741,6 @@ export default function RealtimeFridgeScanner() {
                   style={styles.capturedImage}
                   resizeMode="contain"
                 />
-                {/* <TouchableOpacity
-                  style={styles.clearImageButton}
-                  onPress={async () => {
-                    setPhoto(null);
-                    setIsUploaded(false);
-                    setDetectedInventory([]);
-                    try {
-                      await AsyncStorage.removeItem("lastImage");
-                    } catch (error) {
-                      logger.error(`Failed to clear last image: ${error.message}`);
-                    }
-                  }}
-                >
-                  <Text style={styles.clearImageButtonText}>Clear Image</Text>
-                </TouchableOpacity> */}
               </View>
             )}
             {Object.keys(inventory.items).length === 0 ? (
@@ -769,7 +767,13 @@ export default function RealtimeFridgeScanner() {
                         Quantity: {itemData.count}
                       </Text>
                       <Text style={styles.cardSubtitle}>
-                        Last Taken: {formatDate(itemData.last_detected)}
+                        Last Detected: {formatDate(itemData.last_detected)}
+                      </Text>
+                      <Text style={styles.cardSubtitle}>
+                        Expiry: {formatDate(itemData.expiry_date)}
+                      </Text>
+                      <Text style={styles.cardSubtitle}>
+                        Storage: {itemData.storage_location}
                       </Text>
                     </View>
                     <TouchableOpacity
@@ -801,6 +805,7 @@ export default function RealtimeFridgeScanner() {
     </View>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
