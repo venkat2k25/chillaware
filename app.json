@@ -2,6 +2,7 @@
   "expo": {
     "name": "ChillAware",
     "slug": "ChillAware",
+    "owner": "madhankumar30-2",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icons/Logo.png",
@@ -45,7 +46,8 @@
       "package": "com.karthi_2002.ChillAware",
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.CAMERA"
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
       "runtimeVersion": "1.0.0"
     },
@@ -54,11 +56,11 @@
     },
     "extra": {
       "eas": {
-        "projectId": "094368b1-41dc-4446-8224-999216c9729c"
+        "projectId": "e291e5fc-d3d5-47d3-a35f-d2cd6f9ebd06"
       }
     },
     "updates": {
-      "url": "https://u.expo.dev/094368b1-41dc-4446-8224-999216c9729c"
+      "url": ""
     }
   }
 }

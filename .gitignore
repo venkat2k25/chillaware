@@ -3,6 +3,20 @@
 # dependencies
 node_modules/
 
+# Native project folders (for Expo managed workflow)
+/android
+/ios
+
+# YOLO model files
+yolov3.weights
+yolov3.cfg
+coco.names
+*.weights
+*.cfg
+
+# Temporary build files
+*.tgz
+
 # Expo
 .expo/
 dist/
@@ -34,3 +48,4 @@ yarn-error.*
 
 # typescript
 *.tsbuildinfo
+
