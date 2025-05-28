@@ -10,9 +10,10 @@ import {
   ActivityIndicator,
   FlatList,
   Dimensions,
+  Platform,
 } from "react-native";
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import FoodImage from '../assets/food.png'
+import FoodImage from '../assets/food.png';
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Picker } from '@react-native-picker/picker';
 import Header from "../layouts/Header";
@@ -242,21 +243,33 @@ export default function CookScreen() {
             </TouchableOpacity>
           </View>
 
-{/* Dropdown for Diet Preference */}
-        <View style={styles.dropdownContainer}>
-          <Text style={styles.servingsTitle}>Select Diet Preference</Text>
-          <Picker
-            selectedValue={selectedDiet}
-            onValueChange={(itemValue) => setSelectedDiet(itemValue)}
-            style={styles.picker}
-          >
-            <Picker.Item label="Vegetarian" value="vegetarian" />
-            <Picker.Item label="Pescatarian" value="pescatarian" />
-            <Picker.Item label="Dairy-free" value="dairy-free" />
-            <Picker.Item label="Keto" value="keto" />
-            <Picker.Item label="Gluten-free" value="gluten-free" />
-          </Picker>
-        </View>
+          {/* Dropdown for Diet Preference */}
+          <View style={styles.dropdownContainer}>
+            <Text style={styles.servingsTitle}>Select Diet Preference</Text>
+            <Picker
+              selectedValue={selectedDiet}
+              onValueChange={(itemValue) => setSelectedDiet(itemValue)}
+              style={[
+                styles.picker,
+                Platform.OS === "android" ? styles.pickerAndroid : styles.pickerIOS,
+              ]}
+              dropdownIconColor={Colors.text}
+              itemStyle={styles.pickerItem}
+              accessibilityLabel="Select diet preference"
+              accessibilityHint="Choose a dietary preference for recipe generation"
+            >
+              <Picker.Item label="Vegetarian" value="vegetarian" />
+              <Picker.Item label="Pescatarian" value="pescatarian" />
+              <Picker.Item label="Dairy-free" value="dairy-free" />
+              <Picker.Item label="Keto" value="keto" />
+              <Picker.Item label="Gluten-free" value="gluten-free" />
+              <Picker.Item label="Vegan" value="vegan" />
+              <Picker.Item label="Paleo" value="paleo" />
+              <Picker.Item label="Low-Carb" value="low-carb" />
+              <Picker.Item label="Mediterranean" value="mediterranean" />
+              <Picker.Item label="Whole30" value="whole30" />
+            </Picker>
+          </View>
 
           <TouchableOpacity
             style={styles.generateButton}
@@ -324,7 +337,7 @@ export default function CookScreen() {
                   <Text style={styles.recipeMetaText}>{servings} servings</Text>
                 </View>
 
-                 <View style={styles.recipeMeta}>
+                <View style={styles.recipeMeta}>
                   <MaterialCommunityIcons name="food-apple-outline" size={16}
                     color={Colors.text} />
                   <Text style={styles.recipeMetaText}>{selectedDiet}</Text>
@@ -383,11 +396,10 @@ export default function CookScreen() {
                     {servings} servings
                   </Text>
                 </View>
-                 <View style={styles.recipeDetailMetaItem}>
-                   <MaterialCommunityIcons name="food-apple-outline" size={18} color="white"/>
+                <View style={styles.recipeDetailMetaItem}>
+                  <MaterialCommunityIcons name="food-apple-outline" size={18} color="white"/>
                   <Text style={styles.recipeDetailMetaText}>{selectedDiet}</Text>
                 </View>
-                
               </View>
 
               <View
@@ -584,7 +596,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "600",
     color: Colors.text,
-    marginBottom: 24,
+    marginBottom: 16,
     zIndex: 1,
   },
   servingsInputContainer: {
@@ -621,7 +633,7 @@ const styles = StyleSheet.create({
   generateButtonText: {
     fontSize: 18,
     fontWeight: "500",
-    color: Colors.background
+    color: Colors.background,
   },
   loadingContainer: {
     flex: 1,
@@ -849,14 +861,31 @@ const styles = StyleSheet.create({
     lineHeight: 24,
   },
   dropdownContainer: {
-      flexDirection: 'column',
-      justifyContent: 'start',
-      gap: 0
+    flexDirection: "column",
+    alignItems: "center",
+    width: "100%",
+    marginBottom: 20,
+    zIndex: 1, // Ensure dropdown is above blobWrapper
   },
   picker: {
-    marginTop: '-70',
-    margin: 0,
-    padding: 0,
-  }
-  
+    width: "100%",
+    height: Platform.OS === "android" ? 50 : 120, // Taller on iOS for wheel picker
+    color: Colors.text,
+    backgroundColor: "#ddf7dd",
+    borderRadius: 8,
+    marginTop: 10,
+  },
+  pickerAndroid: {
+    padding: 10,
+    borderWidth: 1,
+    borderColor: Colors.text + "50",
+  },
+  pickerIOS: {
+    padding: 5,
+  },
+  pickerItem: {
+    fontSize: 16,
+    color: Colors.text,
+    height: Platform.OS === "android" ? 50 : 30, // Adjust item height for scrolling
+  },
 });

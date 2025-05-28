@@ -15,6 +15,10 @@ import Header from "../layouts/Header";
 import Colors from "../utils/Colors";
 import fillerImage from "../assets/boy.png";
 import Stock from "../assets/stock.png";
+import Box from "../assets/boxes.png";
+import Invoice from "../assets/invoice.png";
+import CookBook from "../assets/cookbook.png";
+import Fridge from "../assets/fridge.png";
 import ExpiryBillboard from "./ExpiryBillboard";
 
 const windowWidth = Dimensions.get("window").width;
@@ -26,25 +30,25 @@ export default function HomeScreen() {
     id: 1,
     title: "Upload Invoice",
     description: "Add invoices directly to inventory",
-    image: Stock,
+    image: Invoice,
   },
   {
     id: 2,
     title: "Inventory Filter",
     description: "Filter by category and search items",
-    image: Stock,
+    image: Box,
   },
   {
     id: 3,
     title: "Smart Recipe Suggestions",
     description: "Recipes based on diet, servings, and food type",
-    image: Stock,
+    image: CookBook,
   },
   {
     id: 4,
     title: "Virtual Fridge",
     description: "View and manage fridge contents with photos",
-    image: Stock,
+    image: Fridge,
   },
 ]);
 
