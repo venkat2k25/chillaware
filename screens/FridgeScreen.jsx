@@ -49,22 +49,23 @@ class FridgeScanner {
   }
 
   async addDetectedItems(detections) {
+  try {
     let totalAdded = 0;
     const currentTime = Date.now() / 1000; // seconds
     const itemCounts = {};
     const itemConfidences = {};
 
     // Aggregate counts and confidences
-    detections.forEach((detection) => {
-      const itemName = detection.item.toLowerCase();
-      itemCounts[itemName] = (itemCounts[itemName] || 0) + (detection.count || 1);
+    detections.forEach((d) => {
+      const itemName = d.item.toLowerCase();
+      itemCounts[itemName] = (itemCounts[itemName] || 0) + (d.count || 1);
       itemConfidences[itemName] = itemConfidences[itemName] || [];
-      itemConfidences[itemName].push(detection.confidence);
+      itemConfidences[itemName].push(d.confidence);
     });
 
     for (const [itemName, count] of Object.entries(itemCounts)) {
-      // Skip if item is in cooldown
       if (this.detectionCooldown[itemName] && currentTime - this.detectionCooldown[itemName] < this.cooldownDuration) {
+        logger.info(`Skipping ${itemName} due to cooldown`);
         continue;
       }
 
@@ -72,7 +73,7 @@ class FridgeScanner {
       this.fridgeItems[itemName] = {
         name: itemName,
         count: (this.fridgeItems[itemName]?.count || 0) + count,
-        category: this.foodCategories[itemName] || detection.category || "Other",
+        category: this.foodCategories[itemName] || d.category || "Other",
         last_detected: new Date().toISOString(),
         confidence: avgConfidence,
       };
@@ -87,10 +88,14 @@ class FridgeScanner {
       });
     }
 
-    // Save to AsyncStorage
     await this.saveInventoryToStorage();
+    logger.info(`Added ${totalAdded} items to inventory`);
     return totalAdded;
+  } catch (error) {
+    logger.error(`Error in addDetectedItems: ${error.message}, Stack: ${error.stack}`);
+    return 0;
   }
+}
 
   async getInventory() {
     const items = {};
@@ -186,80 +191,89 @@ const formatDate = (dateString) => {
 
 // Helper function to process Vision API response
 const processApiResponse = (response) => {
-  if (!response.responses || !Array.isArray(response.responses)) {
-    logger.error("Invalid Vision API response format");
+  try {
+    if (!response.responses || !Array.isArray(response.responses)) {
+      logger.error("Invalid Vision API response format: 'responses' missing or not an array");
+      return [];
+    }
+
+    const detections = [];
+    const EXCLUDED_TERMS = [
+      "Vegetable", "Produce", "Ingredient", "Food", "Food group", "Cruciferous vegetables",
+      "Leaf vegetable", "Natural foods", "Superfood", "Staple food", "Vegetarian cuisine",
+      "Cabbages", "Fruit", "Nightshade", "Still life photography", "Macro photography",
+      "Plant", "Flowering plant", "Flower", "Close-up",
+    ];
+    const ITEM_VARIANTS = {
+      Tomato: ["Bush tomato", "Plum tomato", "Cherry tomato", "Beefsteak tomato", "Roma tomato"],
+      Apple: ["Granny Smith apple", "Fuji apple"],
+      Pepper: ["Chili pepper", "Bell pepper", "Jalapeno"],
+    };
+
+    const getCanonicalItem = (name) => {
+      const lowerName = name.toLowerCase();
+      for (const [canonical, variants] of Object.entries(ITEM_VARIANTS)) {
+        if (lowerName === canonical.toLowerCase() || variants.map(v => v.toLowerCase()).includes(lowerName)) {
+          return canonical;
+        }
+      }
+      return name;
+    };
+
+    response.responses.forEach((res, index) => {
+      logger.info(`Processing response[${index}]`);
+      // Process localizedObjectAnnotations for accurate counting
+      if (res.localizedObjectAnnotations && Array.isArray(res.localizedObjectAnnotations)) {
+        res.localizedObjectAnnotations.forEach((obj, objIndex) => {
+          logger.info(`Processing localizedObjectAnnotations[${objIndex}]: ${JSON.stringify(obj)}`);
+          if (obj.score > 0.5 && !EXCLUDED_TERMS.includes(obj.name)) {
+            const itemName = getCanonicalItem(obj.name);
+            const existing = detections.find((d) => d.item.toLowerCase() === itemName.toLowerCase());
+            if (!existing) {
+              detections.push({
+                item: itemName,
+                count: 1,
+                category: itemName.toLowerCase().includes("pepper") ? "Spices" : "Vegetables",
+                confidence: obj.score,
+              });
+            } else {
+              existing.count += 1;
+              existing.confidence = Math.max(existing.confidence, obj.score);
+            }
+          }
+        });
+      }
+
+      // Process labelAnnotations only for new items
+      if (res.labelAnnotations && Array.isArray(res.labelAnnotations)) {
+        const specificItems = res.labelAnnotations
+          .filter(
+            (annotation) =>
+              annotation.score > 0.6 &&
+              !EXCLUDED_TERMS.includes(annotation.description) &&
+              !detections.some((d) => d.item.toLowerCase() === getCanonicalItem(annotation.description).toLowerCase())
+          )
+          .sort((a, b) => b.score - a.score);
+
+        specificItems.forEach((item, itemIndex) => {
+          logger.info(`Processing labelAnnotations[${itemIndex}]: ${JSON.stringify(item)}`);
+          const itemName = getCanonicalItem(item.description);
+          detections.push({
+            item: itemName,
+            count: 1,
+            category: itemName.toLowerCase().includes("pepper") ? "Spices" : "Vegetables",
+            confidence: item.score,
+          });
+        });
+      }
+    });
+
+    logger.info(`Final detections: ${JSON.stringify(detections, null, 2)}`);
+    return detections;
+  } catch (error) {
+    logger.error(`Error in processApiResponse: ${error.message}, Stack: ${error.stack}`);
     return [];
   }
-
-  const detections = [];
-  const EXCLUDED_TERMS = [
-    "Vegetable", "Produce", "Ingredient", "Food", "Food group", "Cruciferous vegetables",
-    "Leaf vegetable", "Natural foods", "Superfood", "Staple food", "Vegetarian cuisine",
-    "Cabbages", "Fruit", "Nightshade", "Still life photography", "Macro photography",
-    "Plant", "Flowering plant",
-  ];
-  const ITEM_VARIANTS = {
-    Tomato: ["Bush tomato", "Plum tomato", "Cherry tomato", "Beefsteak tomato"],
-    Apple: ["Granny Smith apple", "Fuji apple"],
-    Pepper: ["Chili pepper", "Bell pepper"],
-  };
-
-  const getCanonicalItem = (name) => {
-    const lowerName = name.toLowerCase();
-    for (const [canonical, variants] of Object.entries(ITEM_VARIANTS)) {
-      if (lowerName === canonical.toLowerCase() || variants.map(v => v.toLowerCase()).includes(lowerName)) {
-        return canonical;
-      }
-    }
-    return name;
-  };
-
-  response.responses.forEach((res) => {
-    // Process localizedObjectAnnotations for accurate counting
-    if (res.localizedObjectAnnotations && Array.isArray(res.localizedObjectAnnotations)) {
-      res.localizedObjectAnnotations.forEach((obj) => {
-        if (obj.score > 0.5 && !EXCLUDED_TERMS.includes(obj.name)) {
-          const itemName = getCanonicalItem(obj.name);
-          const existing = detections.find((d) => d.item.toLowerCase() === itemName.toLowerCase());
-          if (!existing) {
-            detections.push({
-              item: itemName,
-              count: 1,
-              category: itemName.toLowerCase().includes("pepper") ? "Spices" : "Vegetables",
-              confidence: obj.score,
-            });
-          } else {
-            existing.count += 1;
-            existing.confidence = Math.max(existing.confidence, obj.score);
-          }
-        }
-      });
-    }
-
-    // Process labelAnnotations only for new items
-    if (res.labelAnnotations && Array.isArray(res.labelAnnotations)) {
-      const specificItems = res.labelAnnotations
-        .filter(
-          (annotation) =>
-            annotation.score > 0.6 &&
-            !EXCLUDED_TERMS.includes(annotation.description) &&
-            !detections.some((d) => d.item.toLowerCase() === getCanonicalItem(annotation.description).toLowerCase())
-        )
-        .sort((a, b) => b.score - a.score);
-
-      specificItems.forEach((item) => {
-        const itemName = getCanonicalItem(item.description);
-        detections.push({
-          item: itemName,
-          count: 1,
-          category: itemName.toLowerCase().includes("pepper") ? "Spices" : "Vegetables",
-          confidence: item.score,
-        });
-      });
-    }
-  });
-
-  return detections;
 };
 
 // Component
@@ -447,76 +461,86 @@ export default function RealtimeFridgeScanner() {
     }
   };
 
-  const processImageLocally = async (image, retries = 2) => {
-    try {
-      setLoadingInventory(true);
-      const visionRes = await processImage(image);
-      setLoadingInventory(false);
-      setIsUploaded(true);
+ const processImageLocally = async (image, retries = 2) => {
+  try {
+    setLoadingInventory(true);
+    const visionRes = await processImage(image);
+    logger.info(`Vision API response received: ${JSON.stringify(visionRes, null, 2)}`);
 
-      const detections = processApiResponse(visionRes);
-      setDetectedInventory(detections);
-
-      if (detections.length > 0) {
-        setLoadingInventory(true);
-        await scanner.addDetectedItems(detections);
-        await loadInventory();
-        setLoadingInventory(false);
-        await AsyncStorage.setItem("lastImage", image.uri);
-
-        Animated.sequence([
-          Animated.timing(fadeAnim, { toValue: 0.7, duration: 200, useNativeDriver: true }),
-          Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
-        ]).start();
-
-        Alert.alert(
-          "Items Detected",
-          `Detected ${detections.reduce((sum, d) => sum + d.count, 0)} item(s): ${detections
-            .map((d) => `${d.item} (x${d.count})`)
-            .join(", ")}`,
-          [{ text: "OK" }]
-        );
-      } else {
-        Alert.alert(
-          "No Food Items Detected",
-          "No specific food items were found. Try a clearer image with better lighting, or ensure the image contains recognizable food items like fruits or vegetables."
-        );
-        setPhoto(null);
-        setIsUploaded(false);
-        await AsyncStorage.removeItem("lastImage");
-      }
-    } catch (err) {
-      setLoadingInventory(false);
-      setIsUploaded(false);
-      if (retries > 0) {
-        logger.info(`Retrying image processing (${retries} attempts left)...`);
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        return processImageLocally(image, retries - 1);
-      }
-
-      let errorMessage = "Could not process the image. Please check your internet connection.";
-      if (err.response) {
-        errorMessage = `Vision API Error: ${err.response.status} - ${
-          err.response.data?.error?.message || err.response.data || err.message
-        }`;
-        if (err.response.status === 403) {
-          errorMessage = "Invalid API key. Please check your Google Cloud Vision API key.";
-        } else if (err.response.status === 429) {
-          errorMessage = "API quota exceeded. Please check your Google Cloud Console.";
-        }
-      } else if (err.request) {
-        errorMessage = "Network Error: Could not connect to Vision API.";
-      } else {
-        errorMessage = `Request Error: ${err.message}`;
-      }
-      Alert.alert("Processing Failed", errorMessage);
-      setDetectedInventory([]);
-      setPhoto(null);
-      await AsyncStorage.removeItem("lastImage");
-    } finally {
-      setIsProcessing(false);
+    if (!visionRes.responses || !Array.isArray(visionRes.responses)) {
+      throw new Error("Invalid Vision API response: 'responses' missing or not an array");
     }
-  };
+
+    setLoadingInventory(false);
+    setIsUploaded(true);
+
+    const detections = processApiResponse(visionRes);
+    logger.info(`Processed detections: ${JSON.stringify(detections, null, 2)}`);
+    setDetectedInventory(detections);
+
+    if (detections.length > 0) {
+      setLoadingInventory(true);
+      const totalAdded = await scanner.addDetectedItems(detections);
+      logger.info(`Added ${totalAdded} items to inventory`);
+      await loadInventory();
+      setLoadingInventory(false);
+      await AsyncStorage.setItem("lastImage", image.uri);
+
+      Animated.sequence([
+        Animated.timing(fadeAnim, { toValue: 0.7, duration: 200, useNativeDriver: true }),
+        Animated.timing(fadeAnim, { toValue: 1, duration: 200, useNativeDriver: true }),
+      ]).start();
+
+      Alert.alert(
+        "Items Detected",
+        `Detected ${detections.reduce((sum, d) => sum + d.count, 0)} item(s): ${detections
+          .map((d) => `${d.item} (x${d.count})`)
+          .join(", ")}`,
+        [{ text: "OK" }]
+      );
+    } else {
+      Alert.alert(
+        "No Food Items Detected",
+        "No specific food items were found. Try a clearer image with better lighting."
+      );
+      setPhoto(null);
+      setIsUploaded(false);
+      await AsyncStorage.removeItem("lastImage");
+    }
+  } catch (err) {
+    setLoadingInventory(false);
+    setIsUploaded(false);
+    logger.error(`Image processing error: ${err.message}, Stack: ${err.stack}`);
+
+    if (retries > 0) {
+      logger.info(`Retrying image processing (${retries} attempts left)...`);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      return processImageLocally(image, retries - 1);
+    }
+
+    let errorMessage = "Could not process the image. Please check your internet connection.";
+    if (err.response) {
+      errorMessage = `Vision API Error: ${err.response.status} - ${
+        err.response.data?.error?.message || err.response.data || err.message
+      }`;
+      if (err.response.status === 403) {
+        errorMessage = "Invalid API key. Please check your Google Cloud Vision API key.";
+      } else if (err.response.status === 429) {
+        errorMessage = "API quota exceeded. Please check your Google Cloud Console.";
+      }
+    } else if (err.request) {
+      errorMessage = "Network Error: Could not connect to Vision API.";
+    } else {
+      errorMessage = `Request Error: ${err.message}`;
+    }
+    Alert.alert("Processing Failed", errorMessage);
+    setDetectedInventory([]);
+    setPhoto(null);
+    await AsyncStorage.removeItem("lastImage");
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   const toggleCamera = () => {
     if (!cameraPermission) {
